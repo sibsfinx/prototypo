@@ -9,8 +9,15 @@ export default defineConfig({
 			include: '**/*.{jsx,js}',
 			jsxRuntime: 'classic',
 			babel: {
-				presets: ['@babel/preset-flow'],
-				plugins: ['react-hot-loader/babel'],
+				presets: [
+					['@babel/preset-flow', { all: true }],
+					['@babel/preset-env', { modules: false }],
+					'@babel/preset-react',
+				],
+				plugins: [
+					'@babel/plugin-proposal-class-properties',
+					'react-hot-loader/babel',
+				],
 			},
 		}),
 	],
@@ -80,6 +87,7 @@ export default defineConfig({
 		loader: 'jsx',
 		include: /app\/.*\.jsx?$/,
 		exclude: [],
+		jsxInject: `import React from 'react'`,
 	},
 	define: {
 		'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),

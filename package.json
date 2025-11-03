@@ -106,12 +106,12 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:dist": "vite build",
+    "dev": "node scripts/copy-templates.mjs && vite",
+    "build": "node scripts/copy-templates.mjs && vite build",
+    "build:dist": "node scripts/copy-templates.mjs && vite build",
     "preview": "vite preview",
     "build:storybook": "build-storybook",
-    "start": "vite",
+    "start": "node scripts/copy-templates.mjs && vite",
     "storybook": "start-storybook -p 6006",
     "test": "NODE_PATH=$pwd/node_modules:$(pwd)/app jest",
     "lint:files": "prettier-eslint $(find ./app/scripts -type f -regex '.*\\.jsx?') stories/** .babelrc .eslintrc",
