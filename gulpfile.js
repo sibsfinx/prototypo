@@ -53,13 +53,13 @@ gulp.task('cp-antique', () => gulp
 	.src('./node_modules/antique.ptf/dist/font.json')
 	.pipe(gulp.dest('./dist/templates/antique.ptf')));
 
-gulp.task('cp-genese', [
+gulp.task('cp-genese', gulp.series(
 	'cp-john-fell',
 	'cp-venus',
 	'cp-elzevir',
 	'cp-gfnt',
-	'cp-antique',
-], () => {});
+	'cp-antique'
+));
 
 gulp.task('cp-static', () => {
 	gulp.src(['./app/index.html', './app/iframe.html', './app/robots.txt', './app/favicon.ico', './app/404.html'])
@@ -90,7 +90,7 @@ gulp.task('clean', () => {
 	del.sync(['dist']);
 });
 
-gulp.task('build', ['clean', 'images', 'cp-genese', 'cp-static'], (callback) => {
+gulp.task('build', gulp.series('clean', gulp.parallel('images', 'cp-genese', 'cp-static'), (callback) => {
 	// run webpack
 	const webpackConfig = process.env.NODE_ENV === 'production' ? require('./prod.config') : require('./dev.config');
 	const prototypoConfig = Object.create(webpackConfig);
@@ -105,7 +105,7 @@ gulp.task('build', ['clean', 'images', 'cp-genese', 'cp-static'], (callback) => 
 			callback();
 		}
 	);
-});
+}));
 
 gulp.task('clean:dll', (cb) => {
 	del.sync(['dll']);
@@ -139,11 +139,11 @@ gulp.task('prod:dll', (callback) => {
 	});
 });
 
-gulp.task('watch-font', () => gulp.watch(['./node_modules/john-fell.ptf/dist/font.json', './node_modules/venus.ptf/dist/font.json', './node_modules/elzevir.ptf/dist/font.json', './node_modules/gfnt.ptf/dist/font.json', './node_modules/antique.ptf/dist/font.json'], ['cp-genese']));
+gulp.task('watch-font', () => gulp.watch(['./node_modules/john-fell.ptf/dist/font.json', './node_modules/venus.ptf/dist/font.json', './node_modules/elzevir.ptf/dist/font.json', './node_modules/gfnt.ptf/dist/font.json', './node_modules/antique.ptf/dist/font.json'], gulp.series('cp-genese')));
 
-gulp.task('watch-prototypojs', () => gulp.watch(['./node_modules/prototypo.js/dist/prototypo.js', './node_modules/prototypo-canvas/src/worker.js'], ['cp-prototypo.js']));
+gulp.task('watch-prototypojs', () => gulp.watch(['./node_modules/prototypo.js/dist/prototypo.js', './node_modules/prototypo-canvas/src/worker.js'], gulp.series('cp-prototypo.js')));
 
-gulp.task('serve', ['clean', 'images', 'cp-genese', 'cp-static', 'watch-font', 'watch-prototypojs', 'webpack:dll'], (callback) => {
+gulp.task('serve', gulp.series('clean', gulp.parallel('images', 'cp-genese', 'cp-static', 'watch-font', 'watch-prototypojs', 'webpack:dll'), (callback) => {
 	const webpackConfig	= require('./local.config.js');
 	// Start a webpack-dev-server
 	const prototypoConfig = Object.create(webpackConfig);
@@ -166,9 +166,9 @@ gulp.task('serve', ['clean', 'images', 'cp-genese', 'cp-static', 'watch-font', '
 		// keep the server alive or continue?
 		callback();
 	});
-});
+}));
 
-gulp.task('serve:perf', ['clean', 'images', 'cp-genese', 'cp-static', 'watch-font', 'watch-prototypojs', 'webpack:dll'], (callback) => {
+gulp.task('serve:perf', gulp.series('clean', gulp.parallel('images', 'cp-genese', 'cp-static', 'watch-font', 'watch-prototypojs', 'webpack:dll'), (callback) => {
 	const webpackConfig	= require('./prod.config.js');
 	// Start a webpack-dev-server
 	const prototypoConfig = Object.create(webpackConfig);
@@ -191,9 +191,9 @@ gulp.task('serve:perf', ['clean', 'images', 'cp-genese', 'cp-static', 'watch-fon
 		// keep the server alive or continue?
 		callback();
 	});
-});
+}));
 
-gulp.task('debug', ['clean', 'images', 'cp-genese', 'cp-static', 'webpack:dll'], (callback) => {
+gulp.task('debug', gulp.series('clean', gulp.parallel('images', 'cp-genese', 'cp-static', 'webpack:dll'), (callback) => {
 	const webpackConfig	= require('./debug.config.js');
 	// Start a webpack-dev-server
 	const prototypoConfig = Object.create(webpackConfig);
@@ -216,7 +216,7 @@ gulp.task('debug', ['clean', 'images', 'cp-genese', 'cp-static', 'webpack:dll'],
 
 		// keep the server alive or continue?
 	});
-});
+}));
 
 gulp.task('test', callback => gulp.src('')
 	.pipe(nightwatch({
