@@ -29,7 +29,7 @@ export default class WorkerPool {
 	) {
 		// Workers for every thread
 		const numberOfWorker = workerPoolSize;
-		const ProtoWorker = require('worker-loader?inline!./worker.js'); // eslint-disable-line global-require, no-webpack-loader-syntax
+		const ProtoWorker = require('worker-loader?inline=no-fallback!./worker.js'); // eslint-disable-line global-require, no-webpack-loader-syntax
 		let eachJobList = [];
 
 		this.workerArray = [];
