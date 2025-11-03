@@ -7,18 +7,22 @@ WORKDIR /app
 # Install build dependencies
 RUN apk add --no-cache python3 make g++ git
 
-# Copy package files
-COPY package.json yarn.lock ./
+# Enable Corepack for Yarn 3
+RUN corepack enable && corepack prepare yarn@3.8.7 --activate
+
+# Copy package files and Yarn configuration
+COPY package.json .yarnrc.yml ./
+COPY .yarn ./.yarn
 
 # Install dependencies with increased timeout
-RUN yarn install --frozen-lockfile --network-timeout 100000 || \
-    yarn install --network-timeout 100000
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+RUN yarn install --immutable || yarn install
 
 # Copy application files
 COPY . .
 
-# Expose port for development server
-EXPOSE 8080
+# Expose port for development server (Vite uses 9000)
+EXPOSE 9000
 
 # Default command
 CMD ["yarn", "start"]
