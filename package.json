@@ -1,6 +1,7 @@
 {
   "name": "prototypo",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "dependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.23.0",
