@@ -18,7 +18,8 @@ const concat = require('gulp-concat');
 const sourcemaps = require('gulp-sourcemaps');
 const filter = require('gulp-filter');
 const autoprefixer = require('gulp-autoprefixer');
-const gutil	= require('gulp-util');
+const PluginError = require('plugin-error');
+const log = require('fancy-log');
 
 // Tests
 const nightwatch = require('gulp-nightwatch');
@@ -97,8 +98,8 @@ gulp.task('build', ['clean', 'images', 'cp-genese', 'cp-static'], (callback) => 
 	webpack(
 		prototypoConfig,
 		(err, stats) => {
-			if (err) throw new gutil.PluginError('webpack', err);
-			gutil.log('[webpack]', stats.toString({
+			if (err) throw new PluginError('webpack', err);
+			log('[webpack]', stats.toString({
 			// output options
 			}));
 			callback();
@@ -115,9 +116,9 @@ gulp.task('webpack:dll', (callback) => {
 	const prototypoConfig = Object.create(dllWebpackConfig);
 
 	webpack(prototypoConfig, (err, stats) => {
-		if (err) return new gutil.PluginError('webpack', err);
+		if (err) return new PluginError('webpack', err);
 
-		gutil.log('[webpack]', stats.toString({
+		log('[webpack]', stats.toString({
 		}));
 
 		callback();
@@ -129,9 +130,9 @@ gulp.task('prod:dll', (callback) => {
 	const prototypoConfig = Object.create(dllWebpackConfig);
 
 	webpack(prototypoConfig, (err, stats) => {
-		if (err) return new gutil.PluginError('webpack', err);
+		if (err) return new PluginError('webpack', err);
 
-		gutil.log('[webpack]', stats.toString({
+		log('[webpack]', stats.toString({
 		}));
 
 		callback();
@@ -158,9 +159,9 @@ gulp.task('serve', ['clean', 'images', 'cp-genese', 'cp-static', 'watch-font', '
 			poll: 1000,
 		},
 	}).listen(9000, '0.0.0.0', (err) => {
-		if (err) throw new gutil.PluginError('webpack-dev-server', err);
+		if (err) throw new PluginError('webpack-dev-server', err);
 		// Server listening
-		gutil.log('[webpack-dev-server]', 'http://localhost:9000/webpack-dev-server/index.html');
+		log('[webpack-dev-server]', 'http://localhost:9000/webpack-dev-server/index.html');
 
 		// keep the server alive or continue?
 		callback();
@@ -183,9 +184,9 @@ gulp.task('serve:perf', ['clean', 'images', 'cp-genese', 'cp-static', 'watch-fon
 			poll: 1000,
 		},
 	}).listen(9000, '0.0.0.0', (err) => {
-		if (err) throw new gutil.PluginError('webpack-dev-server', err);
+		if (err) throw new PluginError('webpack-dev-server', err);
 		// Server listening
-		gutil.log('[webpack-dev-server]', 'http://localhost:9000/webpack-dev-server/index.html');
+		log('[webpack-dev-server]', 'http://localhost:9000/webpack-dev-server/index.html');
 
 		// keep the server alive or continue?
 		callback();
@@ -209,9 +210,9 @@ gulp.task('debug', ['clean', 'images', 'cp-genese', 'cp-static', 'webpack:dll'],
 			poll: 1000,
 		},
 	}).listen(9000, '0.0.0.0', (err) => {
-		if (err) throw new gutil.PluginError('webpack-dev-server', err);
+		if (err) throw new PluginError('webpack-dev-server', err);
 		// Server listening
-		gutil.log('[webpack-dev-server]', 'http://localhost:9000/webpack-dev-server/index.html');
+		log('[webpack-dev-server]', 'http://localhost:9000/webpack-dev-server/index.html');
 
 		// keep the server alive or continue?
 	});
