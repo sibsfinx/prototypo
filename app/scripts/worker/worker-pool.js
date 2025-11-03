@@ -29,7 +29,7 @@ export default class WorkerPool {
 	) {
 		// Workers for every thread
 		const numberOfWorker = workerPoolSize;
-		const ProtoWorker = require('worker-loader?inline=no-fallback!./worker.js'); // eslint-disable-line global-require, no-webpack-loader-syntax
+		const ProtoWorker = new URL('./worker.js', import.meta.url); // Vite worker syntax
 		let eachJobList = [];
 
 		this.workerArray = [];
@@ -44,7 +44,7 @@ export default class WorkerPool {
 		/* #end */
 
 		for (let i = 0; i < numberOfWorker; i++) {
-			const worker = new ProtoWorker();
+			const worker = new Worker(ProtoWorker, { type: 'module' });
 
 			this.workerArray.push({
 				worker,
