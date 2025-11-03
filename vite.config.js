@@ -6,6 +6,8 @@ import path from 'path';
 export default defineConfig({
 	plugins: [
 		react({
+			include: '**/*.{jsx,js}',
+			jsxRuntime: 'classic',
 			babel: {
 				plugins: ['react-hot-loader/babel'],
 			},
@@ -27,6 +29,7 @@ export default defineConfig({
 	resolve: {
 		extensions: ['.js', '.jsx', '.json'],
 		alias: {
+			'please-wait': path.resolve(__dirname, 'node_modules/please-wait/build/please-wait.js'),
 			'lodash-es': 'lodash',
 			'lodash.assign': 'lodash/assign',
 			'lodash.camelcase': 'lodash/camelCase',
@@ -66,6 +69,16 @@ export default defineConfig({
 	},
 	optimizeDeps: {
 		exclude: ['levelup'],
+		esbuildOptions: {
+			loader: {
+				'.js': 'jsx',
+			},
+		},
+	},
+	esbuild: {
+		loader: 'jsx',
+		include: /app\/.*\.jsx?$/,
+		exclude: [],
 	},
 	define: {
 		'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
