@@ -24,13 +24,14 @@ const log = require('fancy-log');
 // Tests
 const nightwatch = require('gulp-nightwatch');
 
-gulp.task('images', () => {
+gulp.task('images', (done) => {
 	gulp.src(['./app/images/*.*', './app/images/**/*.*'])
 		.pipe(gulp.dest('./dist/assets/images/'));
 	gulp.src('./app/fonts/*.*')
 		.pipe(gulp.dest('./dist/assets/fonts/'));
 	gulp.src('./node_modules/tutorial-content/content/**/*.{png,gif,jpg,svg,mp4,webm}')
 		.pipe(gulp.dest('./dist/assets/images/academy/courses/'));
+	done();
 });
 
 gulp.task('cp-john-fell', () => gulp
@@ -61,21 +62,23 @@ gulp.task('cp-genese', gulp.series(
 	'cp-antique'
 ));
 
-gulp.task('cp-static', () => {
+gulp.task('cp-static', (done) => {
 	gulp.src(['./app/index.html', './app/iframe.html', './app/robots.txt', './app/favicon.ico', './app/404.html'])
 		.pipe(gulp.dest('./dist/'));
+	done();
 });
 
-gulp.task('css-vendor', () => {
+gulp.task('css-vendor', (done) => {
 	// This is a bit hackish but right now i don't care
 	gulp.src(['./node_modules/normalize.css/normalize.css',
 		'./node_modules/please-wait/build/please-wait.css'])
 		.pipe(concat('vendor.css'))
 		.pipe(gulp.dest('./dist/assets/'));
+	done();
 });
 
 
-gulp.task('css-app', () => {
+gulp.task('css-app', (done) => {
 	gulp.src('./app/styles/**/*.scss')
 		.pipe(sourcemaps.init())
 		.pipe(sass())
@@ -84,10 +87,12 @@ gulp.task('css-app', () => {
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('./dist/assets/'))
 		.pipe(filter('**/*.css'));
+	done();
 });
 
-gulp.task('clean', () => {
+gulp.task('clean', (done) => {
 	del.sync(['dist']);
+	done();
 });
 
 gulp.task('build', gulp.series('clean', gulp.parallel('images', 'cp-genese', 'cp-static'), (callback) => {
