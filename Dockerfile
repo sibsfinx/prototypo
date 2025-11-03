@@ -4,11 +4,15 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
+# Install build dependencies
+RUN apk add --no-cache python3 make g++ git
+
 # Copy package files
 COPY package.json yarn.lock ./
 
-# Install dependencies
-RUN yarn install --frozen-lockfile
+# Install dependencies with increased timeout
+RUN yarn install --frozen-lockfile --network-timeout 100000 || \
+    yarn install --network-timeout 100000
 
 # Copy application files
 COPY . .
