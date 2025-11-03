@@ -9,7 +9,7 @@ const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 
 // CSS Dep
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
 const cssnano = require('gulp-cssnano');
 
 // Utils
