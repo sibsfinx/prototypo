@@ -9,6 +9,7 @@ export default defineConfig({
 			include: '**/*.{jsx,js}',
 			jsxRuntime: 'classic',
 			babel: {
+				presets: ['@babel/preset-flow'],
 				plugins: ['react-hot-loader/babel'],
 			},
 		}),
@@ -29,7 +30,7 @@ export default defineConfig({
 	resolve: {
 		extensions: ['.js', '.jsx', '.json'],
 		alias: {
-			'please-wait': path.resolve(__dirname, 'node_modules/please-wait/build/please-wait.js'),
+			'please-wait': path.resolve(__dirname, 'app/vendor/please-wait-wrapper.js'),
 			'lodash-es': 'lodash',
 			'lodash.assign': 'lodash/assign',
 			'lodash.camelcase': 'lodash/camelCase',
