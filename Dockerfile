@@ -16,7 +16,8 @@ COPY .yarn ./.yarn
 
 # Install dependencies with increased timeout
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN yarn install --immutable || yarn install
+ENV YARN_ENABLE_IMMUTABLE_INSTALLS=false
+RUN yarn install --network-timeout 100000 || true
 
 # Copy application files
 COPY . .

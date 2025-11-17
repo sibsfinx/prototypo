@@ -24,9 +24,10 @@ jobs:
         cache: 'yarn'
     
     - name: Install dependencies
-      run: yarn install --frozen-lockfile
+      run: yarn install
       env:
         PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+        YARN_ENABLE_IMMUTABLE_INSTALLS: false
     
     - name: Run linter
       run: yarn lint

@@ -163,5 +163,8 @@
       "git add"
     ]
   },
+  "resolutions": {
+    "upath": "^2.0.1"
+  },
   "packageManager": "yarn@3.8.7"
 }
