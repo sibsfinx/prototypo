@@ -35,8 +35,24 @@ Install build scripts and frontend libraries
 $ yarn
 ```
 
-Running Prototypo
------------------
+Running Prototypo with Docker
+-----------------------------
+
+You can also run Prototypo using Docker:
+
+```bash
+$ docker-compose up
+```
+
+Or build and run the Docker image manually:
+
+```bash
+$ docker build -t prototypo .
+$ docker run -p 8080:8080 prototypo
+```
+
+Running Prototypo (without Docker)
+----------------------------------
 
 ```bash
 $ yarn start

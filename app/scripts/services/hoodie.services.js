@@ -10,8 +10,6 @@ const AWS_URL = `https://${
 	isProduction() ? '67phw2at83' : 'mnhdjpr7jc'
 }.execute-api.eu-west-3.amazonaws.com/${isProduction() ? 'prod' : 'dev'}`;
 
-export const TWITTER_REQUEST_TOKEN_URL = `${AWS_URL}/auth/twitter/requestToken`;
-
 let localClient;
 
 window.addEventListener('fluxServer.setup', async () => {

@@ -1,13 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
 const fs = require('fs');
-const merge = require('webpack-merge');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const { merge } = require('webpack-merge');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const base = require('./base.config');
 
 module.exports = merge(base, {
 	cache: true,
+	mode: 'production',
 	entry: {
 		index: ['whatwg-fetch'],
 	},
@@ -28,12 +29,20 @@ module.exports = merge(base, {
 			},
 		],
 	},
+	optimization: {
+		minimizer: [
+			new TerserPlugin({
+				parallel: true,
+				terserOptions: {
+					sourceMap: true,
+				},
+			}),
+		],
+	},
 	plugins: [
 		new webpack.LoaderOptionsPlugin({
 			options: {
 				'if-loader': 'prod',
-				// TODO: deprecated option, https://webpack.js.org/guides/migrating/#uglifyjsplugin-minimize-loadersminimize: true,
-				minimize: true,
 			},
 		}),
 		new webpack.DefinePlugin({
@@ -41,11 +50,6 @@ module.exports = merge(base, {
 				NODE_ENV: JSON.stringify('production'),
 				TESTING_FONT: false,
 			},
-		}),
-		new UglifyJsPlugin({
-			sourceMap: true,
-			include: __dirname,
-			extractComments: true,
 		}),
 		/* new webpack.DllReferencePlugin({
 			context: __dirname,

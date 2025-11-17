@@ -1,6 +1,6 @@
 import '../styles/main.scss';
 import 'normalize.css/normalize.css';
-import 'please-wait/build/please-wait.css';
+import '../vendor/please-wait.css';
 import 'react-select/dist/react-select.css';
 import 'react-joyride/lib/react-joyride-compiled.css';
 import 'draft-js/dist/Draft.css';

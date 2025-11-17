@@ -1,11 +1,12 @@
 const path = require('path');
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
 const base = require('./base.config');
 
 module.exports = merge(base, {
 	cache: true,
+	mode: 'development',
 	devtool: 'cheap-module-source-map',
 	entry: {
 		index: [
@@ -14,10 +15,10 @@ module.exports = merge(base, {
 		],
 	},
 	module: {
-		loaders: [
+		rules: [
 			{
 				test: /\.jsx?$/,
-				loaders: ['babel-loader?cacheDirectory', 'if-loader'],
+				use: ['babel-loader?cacheDirectory', 'if-loader'],
 				exclude: /node_modules/,
 				include: [path.join(__dirname, 'app')],
 			},

@@ -135,8 +135,10 @@ selectRenderOptions(
 
 		const templates = await Promise.all(
 			prototypoStore.get('templateList').map(async ({templateName}) => {
-				// prettier-ignore
-				const typedataJSON = await import(/* webpackChunkName: "ptfs" */ `../../dist/templates/${templateName}/font.json`);
+				// Use Vite's glob import for templates
+				const templateModules = import.meta.glob('../../dist/templates/*/font.json');
+				const templatePath = `../../dist/templates/${templateName}/font.json`;
+				const typedataJSON = await templateModules[templatePath]();
 				const glyphs = [];
 
 				_forOwn(typedataJSON.glyphs, (glyph) => {

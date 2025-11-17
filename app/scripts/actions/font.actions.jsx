@@ -87,7 +87,11 @@ export default {
 				const template = appValues.values.familySelected
 					? appValues.values.familySelected.template
 					: 'venus.ptf';
-				const typedataJSON = await import(/* webpackChunkName: "ptfs" */ `../../../dist/templates/${template}/font.json`);
+				
+				// Use Vite's glob import for templates
+				const templates = import.meta.glob('../../../dist/templates/*/font.json');
+				const templatePath = `../../../dist/templates/${template}/font.json`;
+				const typedataJSON = await templates[templatePath]();
 
 				localClient.dispatchAction('/create-font-instance', {
 					typedataJSON,

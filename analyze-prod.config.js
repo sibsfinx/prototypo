@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const fs = require('fs');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
 const base = require('./prod.config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')

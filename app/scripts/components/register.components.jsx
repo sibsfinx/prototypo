@@ -12,7 +12,6 @@ import InputWithLabel from './shared/input-with-label.components';
 import SelectWithLabel from './shared/select-with-label.components';
 import AccountValidationButton from './shared/account-validation-button.components';
 import FormError from './shared/form-error.components';
-import OAuthButtons from './oauth-buttons.components';
 
 class Register extends React.Component {
 	constructor(props) {
