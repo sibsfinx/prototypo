@@ -33,12 +33,9 @@
     "react": "^16.4.0",
     "react-addons-css-transition-group": "^15.6.2",
     "react-addons-pure-render-mixin": "^15.6.2",
-    "react-apollo": "^1.4.3",
     "react-dom": "^16.4.0",
     "react-draggable": "^2.2.1",
     "react-dropzone": "^3.13.1",
-    "react-facebook-login": "^4.0.1",
-    "react-google-login": "^3.1.0",
     "react-hot-loader": "^4.0.0",
     "react-joyride": "^1.4.7",
     "react-json-pretty": "^1.6.3",
@@ -51,7 +48,6 @@
     "react-select": "^1.0.0-beta13",
     "react-tippy": "^1.2.2",
     "react-transition-group": "^2.2.0",
-    "react-twitter-auth": "YoruNoHikage/react-twitter-auth",
     "regenerator-runtime": "^0.13.3",
     "remutable": "FranzPoize/remutable#master",
     "svg-inline-react": "3.1.0",
@@ -162,9 +158,6 @@
       "prettier-eslint --write",
       "git add"
     ]
-  },
-  "resolutions": {
-    "upath": "^2.0.1"
   },
   "packageManager": "yarn@3.8.7"
 }

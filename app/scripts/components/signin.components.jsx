@@ -9,7 +9,6 @@ import HoodieApi from '../services/hoodie.services';
 import FormError from './shared/form-error.components';
 import InputWithLabel from './shared/input-with-label.components';
 import AccountValidationButton from './shared/account-validation-button.components';
-import OAuthButtons from './oauth-buttons.components';
 
 export class Signin extends React.Component {
 	constructor(props) {
