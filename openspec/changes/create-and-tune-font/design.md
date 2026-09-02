@@ -32,6 +32,7 @@ See proposal.md — Why. The local-first editor already boots (`pnpm start` on :
 
 - [Joyride / broken header SVGs overlay the editor] → Steps dismiss overlays (Escape / skip) and click by role/text, not by icon.
 - [Onboarding is slow / font compile] → 60s+ waits on dashboard and sliders; one Chromium worker.
+- [FontMediator workers block first paint] → `main.js` publishes `templatesData` without awaiting workers; `FontUpdater` retries until precursors exist. Library names must appear even if Vite is still compiling `worker.js`.
 - [playwright-bdd generate step] → `pnpm test:bdd` runs codegen then Playwright so features stay source of truth.
 - [CI minutes] → Chromium only; no Firefox/WebKit; reuse the Vite process.
 

@@ -18,4 +18,4 @@
 ## 4. Demo and verify
 
 - [x] 4.1 Storyboard beats covering library (all five names in frame), create TuneMe, dashboard, width, slant
-- [ ] 4.2 Record the demo and extract frames; write `verify-report.md` with every beat `pass`
+- [x] 4.2 Record the demo and extract frames; write `verify-report.md` with every beat `pass`

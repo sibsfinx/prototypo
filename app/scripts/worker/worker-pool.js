@@ -24,16 +24,15 @@ function getRandomUuid() {
 }
 
 export default class WorkerPool {
-	constructor(
-		workerPoolSize = Math.min(4, navigator.hardwareConcurrency - 1 || 2),
-	) {
-		const numberOfWorker = workerPoolSize;
+	constructor(workerPoolSize = 1) {
+		const numberOfWorker = Math.max(1, workerPoolSize || 1);
 		let eachJobList = [];
 
 		this.workerArray = [];
 		this.jobCallback = {};
 		this.jobQueue = {};
 		this.fastJobQueue = [];
+		this.workerReady = Promise.resolve();
 
 		if (localClient) {
 			localClient.dispatchAction('/store-value', {
@@ -44,6 +43,18 @@ export default class WorkerPool {
 		for (let i = 0; i < numberOfWorker; i++) {
 			const worker = new Worker(new URL('./worker.js', import.meta.url), {
 				type: 'module',
+			});
+
+			worker.addEventListener('error', (event) => {
+				console.error(
+					'Font worker error',
+					event.message,
+					event.filename,
+					event.lineno,
+				);
+			});
+			worker.addEventListener('messageerror', (event) => {
+				console.error('Font worker messageerror', event);
 			});
 
 			this.workerArray.push({

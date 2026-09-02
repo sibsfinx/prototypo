@@ -7,22 +7,30 @@ const testDir = defineBddConfig({
 	outputDir: '.features-gen',
 });
 
+const chrome = devices['Desktop Chrome'];
+const isCi = Boolean(process.env.CI);
+const baseURL = 'http://localhost:9000';
+
 export default defineConfig({
 	testDir,
-	timeout: 180_000,
-	expect: {timeout: 30_000},
+	timeout: isCi ? 240_000 : 180_000,
+	expect: {timeout: isCi ? 60_000 : 30_000},
 	fullyParallel: false,
 	workers: 1,
-	retries: process.env.CI ? 1 : 0,
-	reporter: process.env.CI
-		? [['github'], ['html', {open: 'never'}]]
+	retries: isCi ? 1 : 0,
+	reporter: isCi
+		? [['github'], ['html', {open: 'never', outputFolder: 'playwright-report'}]]
 		: [['list']],
 	use: {
-		baseURL: 'http://127.0.0.1:9000',
+		...chrome,
+		baseURL,
 		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure',
+		video: 'retain-on-failure',
 		viewport: {width: 1600, height: 1200},
-		...devices['Desktop Chrome'],
+		userAgent: chrome.userAgent,
+		isMobile: false,
+		hasTouch: false,
 	},
 	projects: [
 		{
@@ -32,8 +40,8 @@ export default defineConfig({
 	],
 	webServer: {
 		command: 'pnpm start',
-		url: 'http://127.0.0.1:9000',
-		reuseExistingServer: !process.env.CI,
+		url: baseURL,
+		reuseExistingServer: !isCi,
 		timeout: 180_000,
 		stdout: 'pipe',
 		stderr: 'pipe',

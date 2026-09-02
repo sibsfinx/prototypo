@@ -72,6 +72,16 @@ jobs:
       env:
         CI: true
 
+    - name: Upload Playwright report
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-bdd-report
+        path: |
+          playwright-report
+          test-results
+        if-no-files-found: ignore
+
   docker:
     runs-on: ubuntu-latest
 

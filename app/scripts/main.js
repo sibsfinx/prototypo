@@ -169,7 +169,11 @@ selectRenderOptions(
 			)
 		).filter(Boolean);
 
-		await FontMediator.init(templates);
+		// Do not await workers. Library names come from templatesData; hanging
+		// on FontMediator.init leaves #content empty and CI never sees templates.
+		FontMediator.init(templates).catch((error) => {
+			console.error('FontMediator.init failed', error);
+		});
 
 		const patch = prototypoStore.set('templatesData', templates).commit();
 

@@ -42,4 +42,11 @@ test('Gherkin features execute every user-visible create-and-tune scenario', () 
 	const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 	assert.equal(typeof pkg.scripts['test:bdd'], 'string');
 	assert.match(pkg.scripts['test:bdd'], /bddgen|playwright/);
+
+	const main = readFileSync(join(root, 'app/scripts/main.js'), 'utf8');
+	assert.doesNotMatch(
+		main,
+		/await FontMediator\.init/,
+		'Library boot must not wait on font workers; CI otherwise never paints templates',
+	);
 });

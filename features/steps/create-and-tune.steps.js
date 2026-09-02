@@ -16,9 +16,11 @@ const SLIDER_TARGETS = {
 	Slant: '8',
 };
 
+const LIBRARY_WAIT_MS = process.env.CI ? 180_000 : 60_000;
+
 async function stubThirdParties(page) {
 	await page.route(
-		'**/{widget.intercom.io,js.intercomcdn.com,www.google-analytics.com,www.googletagmanager.com,connect.facebook.net,js.stripe.com,cdn.trackjs.com,api.stripe.com}/**',
+		'**/{widget.intercom.io,js.intercomcdn.com,www.google-analytics.com,www.googletagmanager.com,connect.facebook.net,cdn.trackjs.com}/**',
 		(route) => route.abort(),
 	);
 }
@@ -33,12 +35,32 @@ async function dismissOverlays(page) {
 	}
 }
 
+async function waitForLibrary(page) {
+	const templates = page.locator('.library-item.library-template').first();
+	try {
+		await expect(templates).toBeVisible({timeout: LIBRARY_WAIT_MS});
+	}
+	catch (error) {
+		const url = page.url();
+		const title = await page.title().catch(() => '');
+		const body = await page.locator('body').innerText().catch(() => '');
+		throw new Error(
+			`Library templates never appeared. url=${url} title=${title} body=${body.slice(0, 500)}`,
+			{cause: error},
+		);
+	}
+}
+
 async function openLibrary(page) {
+	page.on('pageerror', (error) => {
+		console.error('[pageerror]', error.message);
+	});
 	await stubThirdParties(page);
+	await page.addInitScript(() => {
+		window._trackJs = {token: '', enabled: false};
+	});
 	await page.goto('/#/library/home', {waitUntil: 'domcontentloaded'});
-	await expect(
-		page.locator('.library-item.library-template').first(),
-	).toBeVisible({timeout: 60_000});
+	await waitForLibrary(page);
 }
 
 async function createFromGrotesk(page, familyName) {
@@ -99,13 +121,17 @@ async function setSlider(page, label, value) {
 }
 
 When('a user with a local session opens {string}', async ({page}, hash) => {
+	page.on('pageerror', (error) => {
+		console.error('[pageerror]', error.message);
+	});
 	await stubThirdParties(page);
+	await page.addInitScript(() => {
+		window._trackJs = {token: '', enabled: false};
+	});
 	await page.goto(`/${hash.replace(/^\//, '')}`, {
 		waitUntil: 'domcontentloaded',
 	});
-	await expect(
-		page.locator('.library-item.library-template').first(),
-	).toBeVisible({timeout: 60_000});
+	await waitForLibrary(page);
 });
 
 Then(
