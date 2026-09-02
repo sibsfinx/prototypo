@@ -9,6 +9,7 @@ app/_typeface/default.typeface.js
 aws.conf.json
 npm-debug.log
 dist
+public/templates
 *.swp
 reports/
 coverage

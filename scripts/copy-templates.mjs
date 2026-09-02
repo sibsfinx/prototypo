@@ -14,8 +14,8 @@ const templates = [
   { name: 'antique.ptf', src: 'antique.ptf' },
 ];
 
-// Create dist/templates directory
-const templatesDir = join(root, 'dist', 'templates');
+// Serve templates from Vite's public dir so fetch('/templates/...') works
+const templatesDir = join(root, 'public', 'templates');
 mkdirSync(templatesDir, { recursive: true });
 
 // Copy each template

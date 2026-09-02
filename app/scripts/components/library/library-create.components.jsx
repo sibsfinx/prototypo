@@ -132,8 +132,8 @@ class LibraryCreate extends React.Component {
 	}
 
 	generateFonts(f, p) {
-		const families = f || this.props.families;
-		const presets = p || this.props.presets;
+		const families = f || this.props.families || [];
+		const presets = p || this.props.presets || [];
 		const customBadgesColor = [
 			'#29ABE2',
 			'#0000FF',
@@ -150,9 +150,13 @@ class LibraryCreate extends React.Component {
 
 		this.state.templateInfos
 			&& this.state.templateInfos.forEach((template) => {
-				const templateData = this.state.templatesData.find(
+				const templateData = (this.state.templatesData || []).find(
 					e => e.name === template.templateName,
 				);
+
+				if (!templateData) {
+					return;
+				}
 
 				fontData.push({
 					template: template.templateName,
@@ -175,7 +179,7 @@ class LibraryCreate extends React.Component {
 			const templateInfo = this.state.templateInfos.find(
 				template => havasPreset.template === template.templateName,
 			) || {name: 'Undefined'};
-			const templateData = this.state.templatesData.find(
+			const templateData = (this.state.templatesData || []).find(
 				e => e.name === havasPreset.template,
 			);
 
@@ -217,7 +221,7 @@ class LibraryCreate extends React.Component {
 				const templateInfo = this.state.templateInfos.find(
 					template => preset.template === template.templateName,
 				) || {name: 'Undefined'};
-				const templateData = this.state.templatesData.find(
+				const templateData = (this.state.templatesData || []).find(
 					e => e.name === preset.template,
 				);
 
@@ -247,13 +251,17 @@ class LibraryCreate extends React.Component {
 			const templateInfo = this.state.templateInfos.find(
 				template => template.templateName === family.template,
 			) || {name: 'Undefined'};
-			const templateData = this.state.templatesData.find(
+			const templateData = (this.state.templatesData || []).find(
 				e => e.name === family.template,
 			);
 
 			const variantToLoad
 				= family.variants.find(e => e.name.toLowerCase() === 'regular')
 				|| family.variants[0];
+
+			if (!templateData || !variantToLoad) {
+				return;
+			}
 
 			fontsToGenerate.push({
 				name: `user${family.id}`,

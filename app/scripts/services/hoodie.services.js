@@ -305,6 +305,10 @@ function setupHoodie(data) {
 }
 
 async function setupStripe(data, time = 1000) {
+	if (!data.stripe) {
+		return;
+	}
+
 	if (data.stripe) {
 		HoodieApi.instance.customerId = data.stripe;
 

@@ -27,9 +27,7 @@ export default class WorkerPool {
 	constructor(
 		workerPoolSize = Math.min(4, navigator.hardwareConcurrency - 1 || 2),
 	) {
-		// Workers for every thread
 		const numberOfWorker = workerPoolSize;
-		const ProtoWorker = new URL('./worker.js', import.meta.url); // Vite worker syntax
 		let eachJobList = [];
 
 		this.workerArray = [];
@@ -37,14 +35,16 @@ export default class WorkerPool {
 		this.jobQueue = {};
 		this.fastJobQueue = [];
 
-		/* #if dev */
-		localClient.dispatchAction('/store-value', {
-			workers: Array(numberOfWorker).fill(false),
-		});
-		/* #end */
+		if (localClient) {
+			localClient.dispatchAction('/store-value', {
+				workers: Array(numberOfWorker).fill(false),
+			});
+		}
 
 		for (let i = 0; i < numberOfWorker; i++) {
-			const worker = new Worker(ProtoWorker, { type: 'module' });
+			const worker = new Worker(new URL('./worker.js', import.meta.url), {
+				type: 'module',
+			});
 
 			this.workerArray.push({
 				worker,
@@ -66,13 +66,10 @@ export default class WorkerPool {
 
 					this.jobCallback[id](fontBuffer);
 					this.jobCallback[id] = undefined;
-				}
-				else if (e.data.id.indexOf('each') === 0) {
-					// TODO(franz): think about timing out
+				} else if (e.data.id.indexOf('each') === 0) {
 					if (eachJobList.length < numberOfWorker - 1) {
 						eachJobList.push(1);
-					}
-					else {
+					} else {
 						eachJobList = [];
 						this.jobCallback[e.data.id](e.data);
 						this.jobCallback[e.data.id] = undefined;
@@ -81,11 +78,11 @@ export default class WorkerPool {
 
 				this.workerArray[i].working = false;
 
-				/* #if dev */
-				localClient.dispatchAction('/store-value', {
-					workers: this.workerArray.map(w => w.working),
-				});
-				/* #end */
+				if (localClient) {
+					localClient.dispatchAction('/store-value', {
+						workers: this.workerArray.map((w) => w.working),
+					});
+				}
 
 				if (!this.areWorkerBusy() && this.jobQueue) {
 					const pipelineNames = Object.keys(this.jobQueue);
@@ -103,7 +100,7 @@ export default class WorkerPool {
 	}
 
 	getFreeWorker() {
-		return _find(this.workerArray, worker => !worker.working);
+		return _find(this.workerArray, (worker) => !worker.working);
 	}
 
 	areWorkerBusy() {
@@ -128,8 +125,7 @@ export default class WorkerPool {
 
 		if (this.areWorkerBusy()) {
 			this.jobQueue[pipeline] = job;
-		}
-		else if (job) {
+		} else if (job) {
 			const jobId = `${time}${uuid}`;
 
 			job.action.id = jobId;
@@ -156,7 +152,7 @@ export default class WorkerPool {
 			this.workerArray[i].worker.postMessage(job.action);
 			/* #if dev */
 			localClient.dispatchAction('/store-value', {
-				workers: this.workerArray.map(worker => worker.working),
+				workers: this.workerArray.map((worker) => worker.working),
 			});
 			/* #end */
 		}

@@ -226,8 +226,8 @@ class LibraryList extends React.Component {
 	}
 
 	generateFonts(f, p, fa) {
-		const families = f || this.props.families;
-		const presets = p || this.props.presets;
+		const families = f || this.props.families || [];
+		const presets = p || this.props.presets || [];
 		const favourites = fa || this.props.favourites || [];
 		const customBadgesColor = [
 			'#003049',
@@ -253,9 +253,13 @@ class LibraryList extends React.Component {
 
 		this.state.templateInfos
 			&& this.state.templateInfos.forEach((template) => {
-				const templateData = this.state.templatesData.find(
+				const templateData = (this.state.templatesData || []).find(
 					e => e.name === template.templateName,
 				);
+
+				if (!templateData) {
+					return;
+				}
 
 				fontData.push({
 					template: template.templateName,
@@ -278,7 +282,7 @@ class LibraryList extends React.Component {
 			const templateInfo = this.state.templateInfos.find(
 				template => havasPreset.template === template.templateName,
 			) || {name: 'Undefined'};
-			const templateData = this.state.templatesData.find(
+			const templateData = (this.state.templatesData || []).find(
 				e => e.name === havasPreset.template,
 			);
 
@@ -320,7 +324,7 @@ class LibraryList extends React.Component {
 				const templateInfo = this.state.templateInfos.find(
 					template => preset.template === template.templateName,
 				) || {name: 'Undefined'};
-				const templateData = this.state.templatesData.find(
+				const templateData = (this.state.templatesData || []).find(
 					e => e.name === preset.template,
 				);
 
@@ -357,9 +361,11 @@ class LibraryList extends React.Component {
 				);
 
 				if (!templateInfo) return;
-				const templateData = this.state.templatesData.find(
+				const templateData = (this.state.templatesData || []).find(
 					e => e.name === family.template,
 				);
+
+				if (!templateData) return;
 
 				family.tags && family.tags.map(tag => allTags.push(tag));
 				const variantToLoad
@@ -410,7 +416,7 @@ class LibraryList extends React.Component {
 						const templateInfo = this.state.templateInfos.find(
 							template => template.templateName === family.template,
 						) || {name: 'Undefined'};
-						const templateData = this.state.templatesData.find(
+						const templateData = (this.state.templatesData || []).find(
 							e => e.name === family.template,
 						);
 

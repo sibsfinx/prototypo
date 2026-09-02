@@ -15,6 +15,7 @@ import LocalClient from '../stores/local-client.stores';
 
 import {FontValues} from '../services/values.services';
 import apolloClient from '../services/graphcool.services';
+import {loadTemplateJson} from '../helpers/load-template.helpers';
 
 import {loadFontValues, saveAppValues} from '../helpers/loadValues.helpers';
 import {BatchUpdate} from '../helpers/undo-stack.helpers';
@@ -87,11 +88,7 @@ export default {
 				const template = appValues.values.familySelected
 					? appValues.values.familySelected.template
 					: 'venus.ptf';
-				
-				// Use Vite's glob import for templates
-				const templates = import.meta.glob('../../../dist/templates/*/font.json');
-				const templatePath = `../../../dist/templates/${template}/font.json`;
-				const typedataJSON = await templates[templatePath]();
+				const typedataJSON = await loadTemplateJson(template);
 
 				localClient.dispatchAction('/create-font-instance', {
 					typedataJSON,
@@ -142,7 +139,7 @@ export default {
 		localClient.dispatchAction('/load-tags', typedata.fontinfo.tags);
 	},
 	'/change-font': async ({templateToLoad, variant, family}) => {
-		const typedataJSON = await import(/* webpackChunkName: "ptfs" */ `../../../dist/templates/${templateToLoad}/font.json`);
+		const typedataJSON = await loadTemplateJson(templateToLoad);
 
 		localClient.dispatchAction('/store-value-font', {
 			changingFont: true,
@@ -201,7 +198,9 @@ export default {
 
 		saveAppValues();
 
-		const {data: {user}} = await apolloClient.query({
+		const {
+			data: {user},
+		} = await apolloClient.query({
 			query: gql`
 				query getVariantsCount {
 					user {
@@ -247,7 +246,9 @@ export default {
 			values.slant = 10;
 		}
 
-		const {data: {variant}} = await apolloClient.mutate({
+		const {
+			data: {variant},
+		} = await apolloClient.mutate({
 			mutation: gql`
 				mutation createVariant($name: String!, $familyId: ID!, $values: Json) {
 					variant: createVariant(
@@ -283,7 +284,9 @@ export default {
 			errorAddVariant: undefined,
 		});
 
-		const {data: {user}} = await apolloClient.query({
+		const {
+			data: {user},
+		} = await apolloClient.query({
 			query: gql`
 				query getvariantscount {
 					user {
@@ -332,7 +335,9 @@ export default {
 			family.name === currentFamily.name
 			&& family.template === currentFamily.template
 		) {
-			const {data: {user}} = await apolloClient.query({
+			const {
+				data: {user},
+			} = await apolloClient.query({
 				fetchPolicy: 'cache-first',
 				query: gql`
 					query getUserLibrary {

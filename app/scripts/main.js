@@ -23,6 +23,7 @@ import {loadStuff} from './helpers/appSetup.helpers';
 import isProduction from './helpers/is-production.helpers';
 
 import FontMediator from './prototypo.js/mediator/FontMediator';
+import {loadTemplateJson} from './helpers/load-template.helpers';
 
 import appValuesAction from './actions/appValues.actions';
 import exportAction from './actions/export.actions';
@@ -133,35 +134,40 @@ selectRenderOptions(
 
 		const eventDebugger = new EventDebugger();
 
-		const templates = await Promise.all(
-			prototypoStore.get('templateList').map(async ({templateName}) => {
-				// Use Vite's glob import for templates
-				const templateModules = import.meta.glob('../../dist/templates/*/font.json');
-				const templatePath = `../../dist/templates/${templateName}/font.json`;
-				const typedataJSON = await templateModules[templatePath]();
-				const glyphs = [];
+		const templates = (
+			await Promise.all(
+				prototypoStore.get('templateList').map(async ({templateName}) => {
+					try {
+						const typedataJSON = await loadTemplateJson(templateName);
+						const glyphs = [];
 
-				_forOwn(typedataJSON.glyphs, (glyph) => {
-					if (!glyphs[glyph.unicode]) {
-						glyphs[glyph.unicode] = [];
+						_forOwn(typedataJSON.glyphs, (glyph) => {
+							if (!glyphs[glyph.unicode]) {
+								glyphs[glyph.unicode] = [];
+							}
+							glyphs[glyph.unicode].push(glyph);
+						});
+						const initValues = {};
+
+						typedataJSON.controls.forEach(group =>
+							group.parameters.forEach((param) => {
+								initValues[param.name] = param.init;
+							}),
+						);
+						return {
+							name: templateName,
+							json: typedataJSON,
+							initValues,
+							glyphs,
+						};
 					}
-					glyphs[glyph.unicode].push(glyph);
-				});
-				const initValues = {};
-
-				typedataJSON.controls.forEach(group =>
-					group.parameters.forEach((param) => {
-						initValues[param.name] = param.init;
-					}),
-				);
-				return {
-					name: templateName,
-					json: typedataJSON,
-					initValues,
-					glyphs,
-				};
-			}),
-		);
+					catch (err) {
+						console.error(`Failed to load template ${templateName}`, err);
+						return null;
+					}
+				}),
+			)
+		).filter(Boolean);
 
 		await FontMediator.init(templates);
 

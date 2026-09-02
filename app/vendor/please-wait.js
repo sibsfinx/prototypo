@@ -17,7 +17,7 @@
   } else {
     factory(root);
   }
-})(this, function(exports) {
+})(typeof window !== "undefined" ? window : this, function(exports) {
   var PleaseWait, addClass, animationEvent, animationSupport, domPrefixes, elm, key, pfx, pleaseWait, removeClass, transEndEventNames, transitionEvent, transitionSupport, val, _i, _len;
   elm = document.createElement('fakeelement');
   animationSupport = false;

@@ -1,24 +1,68 @@
-import { defineConfig } from 'vite';
+import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import {fileURLToPath} from 'url';
+import fs from 'fs';
+import * as babel from '@babel/core';
 
-// https://vitejs.dev/config/
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const babelOptions = {
+	presets: [
+		['@babel/preset-flow', {all: true}],
+		['@babel/preset-env', {modules: false}],
+		'@babel/preset-react',
+	],
+	plugins: ['@babel/plugin-proposal-class-properties'],
+};
+
+function stripFlow(code, filename) {
+	return babel.transformSync(code, {
+		filename,
+		presets: [
+			['@babel/preset-flow', {all: true}],
+			'@babel/preset-react',
+		],
+		plugins: ['@babel/plugin-proposal-class-properties'],
+		babelrc: false,
+		configFile: false,
+		sourceMaps: true,
+		compact: false,
+	});
+}
+
+function flowEsbuildPlugin() {
+	return {
+		name: 'strip-flow-esbuild',
+		setup(build) {
+			build.onLoad({filter: /\/app\/.*\.(js|jsx)$/}, async (args) => {
+				const source = await fs.promises.readFile(args.path, 'utf8');
+				const result = stripFlow(source, args.path);
+
+				return {
+					contents: result.code,
+					loader: args.path.endsWith('.jsx') ? 'jsx' : 'js',
+				};
+			});
+		},
+	};
+}
+
+const env = {
+	NODE_ENV: process.env.NODE_ENV || 'development',
+	TESTING_FONT: process.env.TESTING_FONT || false,
+	MERGE: process.env.MERGE || false,
+	LIBRARY: process.env.LIBRARY || '',
+	__SHOW_ACTION__: process.env.__SHOW_ACTION__ || '',
+	__SHOW_RENDER__: process.env.__SHOW_RENDER__ || '',
+};
+
 export default defineConfig({
 	plugins: [
 		react({
 			include: '**/*.{jsx,js}',
 			jsxRuntime: 'classic',
-			babel: {
-				presets: [
-					['@babel/preset-flow', { all: true }],
-					['@babel/preset-env', { modules: false }],
-					'@babel/preset-react',
-				],
-				plugins: [
-					'@babel/plugin-proposal-class-properties',
-					'react-hot-loader/babel',
-				],
-			},
+			babel: babelOptions,
 		}),
 	],
 	root: 'app',
@@ -28,16 +72,16 @@ export default defineConfig({
 		emptyOutDir: true,
 		sourcemap: true,
 		rollupOptions: {
-			input: {
-				main: path.resolve(__dirname, 'app/index.html'),
-				iframe: path.resolve(__dirname, 'app/iframe.html'),
-			},
+			input: path.resolve(__dirname, 'app/index.html'),
 		},
 	},
 	resolve: {
 		extensions: ['.js', '.jsx', '.json'],
 		alias: {
-			'please-wait': path.resolve(__dirname, 'app/vendor/please-wait-wrapper.js'),
+			'please-wait': path.resolve(
+				__dirname,
+				'app/vendor/please-wait-wrapper.js',
+			),
 			'lodash-es': 'lodash',
 			'lodash.assign': 'lodash/assign',
 			'lodash.camelcase': 'lodash/camelCase',
@@ -74,24 +118,40 @@ export default defineConfig({
 		port: 9000,
 		host: '0.0.0.0',
 		open: false,
+		fs: {
+			allow: [path.resolve(__dirname)],
+		},
+	},
+	worker: {
+		format: 'es',
+		plugins: () => [
+			react({
+				include: '**/*.{jsx,js}',
+				jsxRuntime: 'classic',
+				babel: {
+					presets: [
+						['@babel/preset-flow', {all: true}],
+						['@babel/preset-env', {modules: false}],
+					],
+					plugins: ['@babel/plugin-proposal-class-properties'],
+				},
+			}),
+		],
 	},
 	optimizeDeps: {
+		entries: ['index.html'],
 		exclude: ['levelup'],
 		esbuildOptions: {
 			loader: {
 				'.js': 'jsx',
 			},
+			plugins: [flowEsbuildPlugin()],
 		},
 	},
-	esbuild: {
-		loader: 'jsx',
-		include: /app\/.*\.jsx?$/,
-		exclude: [],
-		jsxInject: `import React from 'react'`,
-	},
-	define: {
-		'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-		'process.env.TESTING_FONT': JSON.stringify(process.env.TESTING_FONT || false),
-		'process.env.MERGE': JSON.stringify(process.env.MERGE || false),
-	},
+	define: Object.fromEntries(
+		Object.entries(env).map(([key, value]) => [
+			`process.env.${key}`,
+			JSON.stringify(value),
+		]),
+	),
 });
