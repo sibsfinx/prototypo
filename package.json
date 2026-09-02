@@ -97,7 +97,8 @@
     "vite": "^5.0.8"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24",
+    "pnpm": ">=11"
   },
   "description": "Prototypo, kickstarting font creation",
   "directories": {
@@ -114,8 +115,8 @@
     "test": "NODE_PATH=$pwd/node_modules:$(pwd)/app jest",
     "test:unit": "node --import ./__tests__/unit/register-loader.mjs --test __tests__/unit/*.test.mjs",
     "lint:files": "prettier-eslint $(find ./app/scripts -type f -regex '.*\\.jsx?') stories/** .babelrc .eslintrc",
-    "lint": "npm run lint:files -- --list-different",
-    "format": "npm run lint:files -- --write",
+    "lint": "pnpm run lint:files -- --list-different",
+    "format": "pnpm run lint:files -- --write",
     "precommit": "lint-staged"
   },
   "repository": {
@@ -161,5 +162,5 @@
       "git add"
     ]
   },
-  "packageManager": "yarn@3.8.7"
+  "packageManager": "pnpm@11.25.0"
 }

@@ -31,7 +31,7 @@ Slant dragged off `0`. Preview stays on screen and reads slanted. Tail of the MP
 
 ## Unit tests
 
-`yarn test:unit` — 8 passed (Formula missing/NaN → 0, control inits, local session / createFamily).
+`pnpm test:unit` — 8 passed (Formula missing/NaN → 0, control inits, local session / createFamily).
 
 ## Open items
 

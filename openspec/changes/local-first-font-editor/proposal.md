@@ -8,7 +8,7 @@ The Graphcool backend is dead, so the Vite app could not open a library or build
 - Serve parametric **templates** as static JSON and load them with `fetch`.
 - Create a **family** + Regular **variant** from a template and persist them locally.
 - Build glyphs using **control inits** and Formula `0` defaults so sliders cannot NaN the font.
-- Vite runtime (Flow strip, ESM config, SVG/`please-wait` shims) so `yarn start` actually boots the editor.
+- Vite runtime (Flow strip, ESM config, SVG/`please-wait` shims) so `pnpm start` actually boots the editor.
 
 ## Capabilities
 

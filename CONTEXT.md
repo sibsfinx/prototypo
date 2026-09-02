@@ -18,6 +18,6 @@ Prototypo is a parametric font editor. This fork runs **local-first**: no Graphc
 
 ## Runtime
 
-- Node ≥ 20, Yarn 3.8.7 (`nodeLinker: node-modules`), Vite 5 on port 9000.
-- `yarn start` copies templates then serves `app/` with `public/` as Vite public dir.
+- Node ≥ 24 (Active LTS), pnpm 11 (`shamefully-hoist`), Vite 5 on port 9000.
+- `pnpm start` copies templates then serves `app/` with `public/` as Vite public dir.
 - Academy courses are stubbed. Remote `merge.prototypo.io` is skipped unless `MERGE` is set.

@@ -14,19 +14,19 @@ This document outlines the strategy for gradually updating dependencies in Proto
 
 1. **lodash** (^4.17.11 → ^4.17.21)
    - Known security vulnerabilities in older versions
-   - Update: `yarn upgrade lodash@^4.17.21`
+   - Update: `pnpm update lodash@^4.17.21`
 
 2. **moment** (^2.10.3 → ^2.29.4 or migrate to date-fns)
    - Very outdated, consider migration to date-fns or dayjs
-   - Update: `yarn upgrade moment@^2.29.4`
+   - Update: `pnpm update moment@^2.29.4`
 
 3. **jszip** (^2.5.0 → ^3.10.1)
    - Major version behind
-   - Update: `yarn upgrade jszip@^3.10.1`
+   - Update: `pnpm update jszip@^3.10.1`
 
 4. **opentype.js** (^0.6.9 → ^1.3.4)
    - Core dependency for font handling
-   - Update: `yarn upgrade opentype.js@^1.3.4`
+   - Update: `pnpm update opentype.js@^1.3.4`
 
 5. **React ecosystem** (16.4.0 → 18.x)
    - Major version updates available
@@ -61,7 +61,7 @@ This document outlines the strategy for gradually updating dependencies in Proto
 
 ## Testing Strategy
 
-- Run `yarn lint` after updates
-- Run `yarn test` after updates
-- Run `yarn build:dist` after updates
+- Run `pnpm lint` after updates
+- Run `pnpm test:unit` after updates
+- Run `pnpm build` after updates
 - Manual testing of key features

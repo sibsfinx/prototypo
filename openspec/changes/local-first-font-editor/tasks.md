@@ -6,7 +6,7 @@
 
 ## 2. Library and templates
 
-- [x] 2.1 Copy templates into `public/templates/<name>/font.json` on `yarn start`
+- [x] 2.1 Copy templates into `public/templates/<name>/font.json` on `pnpm start`
 - [x] 2.2 Load templates with `fetch('/templates/...')`
 - [x] 2.3 Show Spectral, Antique Gothic, Elzevir, Grotesk, Fell in the library
 
@@ -24,6 +24,6 @@
 ## 5. Demo and verify
 
 - [x] 5.1 Storyboard beats covering library, create, width slider, slant slider
-- [x] 5.2 `yarn test:unit` green
+- [x] 5.2 `pnpm test:unit` green
 - [x] 5.3 Record demo of create + customize
 - [x] 5.4 Extract frames and verify each beat against the named spec scenario

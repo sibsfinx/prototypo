@@ -14,14 +14,7 @@ public/templates
 reports/
 coverage
 yarn-error.log
+pnpm-debug.log
 package-lock.json
 .vscode
-
-# Yarn 3 (Berry)
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 .pnp.*

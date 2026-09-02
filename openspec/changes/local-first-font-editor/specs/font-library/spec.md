@@ -8,7 +8,7 @@ The library at `#/library/home` SHALL show the five bundled templates: Spectral,
 - **THEN** all five template names are visible
 
 ### Requirement: Template JSON is fetchable
-Each template SHALL be available at `/templates/<templateName>/font.json` after `yarn start` copies them from `node_modules`.
+Each template SHALL be available at `/templates/<templateName>/font.json` after `pnpm start` copies them from `node_modules`.
 
 #### Scenario: Template font.json loads
 - **WHEN** the app requests `/templates/venus.ptf/font.json`

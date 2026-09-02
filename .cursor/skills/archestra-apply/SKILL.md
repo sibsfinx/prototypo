@@ -28,8 +28,8 @@ Do not skip a phase. A later phase that would fail is a stop, not a note.
 
 ### 3. Test
 
-1. Run the unit seam tests: `yarn test:unit`.
-2. If a browser/dev-server path is in scope, start `yarn start` and hit the routes the storyboard names.
+1. Run the unit seam tests: `pnpm test:unit`.
+2. If a browser/dev-server path is in scope, start `pnpm start` and hit the routes the storyboard names.
 3. A red test or a broken route is a build defect: go back to Build. Do not record a demo of a failing product.
 
 ### 4. Demo-record
