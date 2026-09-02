@@ -112,6 +112,7 @@
     "start": "node scripts/copy-templates.mjs && vite",
     "storybook": "start-storybook -p 6006",
     "test": "NODE_PATH=$pwd/node_modules:$(pwd)/app jest",
+    "test:unit": "node --import ./__tests__/unit/register-loader.mjs --test __tests__/unit/*.test.mjs",
     "lint:files": "prettier-eslint $(find ./app/scripts -type f -regex '.*\\.jsx?') stories/** .babelrc .eslintrc",
     "lint": "npm run lint:files -- --list-different",
     "format": "npm run lint:files -- --write",

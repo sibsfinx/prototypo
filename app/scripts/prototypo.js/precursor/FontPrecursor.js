@@ -3,6 +3,7 @@ import _forOwn from 'lodash/forOwn';
 
 import {constantOrFormula} from '../utils/generic';
 
+import {controlInitsFromControls} from './control-inits';
 import Glyph from './Glyph';
 
 const keyToTransform = [
@@ -33,13 +34,7 @@ export default class FontPrecursor {
 		};
 
 		this.unicodeToGlyphName = {};
-		this.controlInits = {};
-
-		(fontSrc.controls || []).forEach((group) => {
-			(group.parameters || []).forEach((param) => {
-				this.controlInits[param.name] = param.init;
-			});
-		});
+		this.controlInits = controlInitsFromControls(fontSrc.controls);
 
 		this.glyphs = _mapValues(fontSrc.glyphs, (glyph) => {
 			if (glyph.name.indexOf('alt') === -1) {
