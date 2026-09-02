@@ -20,4 +20,5 @@ Prototypo is a parametric font editor. This fork runs **local-first**: no Graphc
 
 - Node ≥ 24 (Active LTS), pnpm 11 (`shamefully-hoist`), Vite 5 on port 9000.
 - `pnpm start` copies templates then serves `app/` with `public/` as Vite public dir.
+- `pnpm test:unit` covers Formula / control inits / local-api. `pnpm test:bdd` runs Gherkin create-and-tune scenarios in Chromium.
 - Academy courses are stubbed. Remote `merge.prototypo.io` is skipped unless `MERGE` is set.

@@ -1,9 +1,9 @@
 schema: spec-driven
 
 context: |
-  Prototypo local-first font editor. React 16 + Apollo 1 + Flux stores, Vite 5, Yarn 3.
+  Prototypo local-first font editor. React 16 + Apollo 1 + Flux stores, Vite 5, pnpm 11.
   Glossary lives in CONTEXT.md. OpenSpec is the spec of record.
-  Apply loop is /archestra-apply: plan, build, test (pnpm test:unit), demo-record, verify frames against scenarios.
+  Apply loop is /archestra-apply: plan, build, test (pnpm test:unit and pnpm test:bdd), demo-record, verify frames against scenarios.
   Do not restore Graphcool, Stripe, or OAuth. Do not commit public/templates/*.json.
 
 rules:
@@ -17,5 +17,5 @@ rules:
 operations:
   apply:
     guidance:
-      - After code tasks, run pnpm test:unit before marking the test tasks done
+      - After code tasks, run pnpm test:unit and pnpm test:bdd before marking the test tasks done
       - Do not archive until archestra-apply verify-report.md exists with every beat pass
