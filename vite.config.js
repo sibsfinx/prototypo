@@ -82,6 +82,10 @@ export default defineConfig({
 				__dirname,
 				'app/vendor/please-wait-wrapper.js',
 			),
+			'tutorial-content': path.resolve(
+				__dirname,
+				'app/vendor/tutorial-content-stub.js',
+			),
 			'lodash-es': 'lodash',
 			'lodash.assign': 'lodash/assign',
 			'lodash.camelcase': 'lodash/camelCase',
@@ -140,7 +144,7 @@ export default defineConfig({
 	},
 	optimizeDeps: {
 		entries: ['index.html'],
-		exclude: ['levelup'],
+		exclude: ['levelup', 'tutorial-content'],
 		esbuildOptions: {
 			loader: {
 				'.js': 'jsx',

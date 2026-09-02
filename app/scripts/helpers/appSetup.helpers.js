@@ -29,7 +29,7 @@ const defaultValues = {
 		firstTimeCollection: true,
 		firstTimeIndivCreate: true,
 		firstTimeIndivEdit: true,
-		firstTimeAcademyModal: true,
+		firstTimeAcademyModal: false,
 		rulerDisplayed: true,
 		guides: [],
 	},
@@ -85,15 +85,22 @@ export async function loadStuff() {
 			`,
 		});
 
-		const families = response.data.user.library;
-		const allPresets = allPresetsQuery.data.allPresets;
+		const families
+			= (response.data && response.data.user && response.data.user.library) || [];
+		const allPresets
+			= (allPresetsQuery.data && allPresetsQuery.data.allPresets) || [];
 
 		appValues = await AppValues.get({typeface: 'default'});
 
-		appValues = {
-			...appValues,
-			values: {...defaultValues.values, ...appValues.values},
-		};
+		if (!appValues || !appValues.values) {
+			appValues = defaultValues;
+		}
+		else {
+			appValues = {
+				...appValues,
+				values: {...defaultValues.values, ...appValues.values},
+			};
+		}
 
 		let {variantSelected, familySelected} = appValues.values;
 

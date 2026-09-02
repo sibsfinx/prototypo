@@ -64,9 +64,15 @@ export default class WorkerPool {
 
 					const fontBuffer = data.slice(1 + idLength, data.byteLength);
 
-					this.jobCallback[id](fontBuffer);
-					this.jobCallback[id] = undefined;
-				} else if (e.data.id.indexOf('each') === 0) {
+					if (this.jobCallback[id]) {
+						this.jobCallback[id](fontBuffer);
+						this.jobCallback[id] = undefined;
+					}
+				} else if (
+					e.data &&
+					typeof e.data.id === 'string' &&
+					e.data.id.indexOf('each') === 0
+				) {
 					if (eachJobList.length < numberOfWorker - 1) {
 						eachJobList.push(1);
 					} else {

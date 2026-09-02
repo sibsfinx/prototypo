@@ -11,6 +11,7 @@ import ResizablePanels from './shared/resizable-panels.components';
 import PrototypoText from './prototypo-text.components';
 import PrototypoCanvas from './prototypo-canvas.components';
 import PrototypoWord from './prototypo-word.components';
+import lockSvg from '../../images/academy/lock.svg?raw';
 
 export default class PrototypoPanel extends React.Component {
 	constructor(props) {
@@ -173,7 +174,7 @@ export default class PrototypoPanel extends React.Component {
 				<div className="panel-demo-overlay-text">
 					<InlineSVG
 						element="div"
-						src={require('!svg-inline-loader!../../images/academy/lock.svg')}
+						src={lockSvg}
 						onClick={this.openGoProModal}
 					/>
 					<p>{featureHovered}</p>

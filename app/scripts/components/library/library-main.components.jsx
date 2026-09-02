@@ -11,6 +11,7 @@ import DuplicateVariant from '../familyVariant/duplicate-variant.components.jsx'
 import LoadingOverlay from '../shared/loading-overlay.components.jsx';
 import GoProModal from '../go-pro-modal.components.jsx';
 import {LibrarySidebarLeft} from './library-sidebars.components';
+import lockSvg from '../../../images/academy/lock.svg?raw';
 
 class LibraryMain extends React.Component {
 	constructor(props) {
@@ -177,7 +178,7 @@ class LibraryMain extends React.Component {
 				<div className="panel-demo-overlay-text">
 					<InlineSVG
 						element="div"
-						src={require('!svg-inline-loader!../../../images/academy/lock.svg')}
+						src={lockSvg}
 						onClick={this.openGoProModal}
 					/>
 					<p>{featureHovered}</p>

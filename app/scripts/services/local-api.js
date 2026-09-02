@@ -25,6 +25,8 @@ function seedDb() {
 			manager: null,
 			appValues: {},
 			firstContactMade: true,
+			academyProgress: {},
+			academyCompleted: false,
 			libraryAccessToken: 'local-library-token',
 			libraryIds: [],
 			favouriteIds: [],
@@ -117,6 +119,7 @@ function hydrateAbstracted(db, abstracted) {
 
 	return {
 		...abstracted,
+		__typename: 'AbstractedFont',
 		preset: abstracted.presetId
 			? db.presets.find(preset => preset.id === abstracted.presetId) || {
 				id: abstracted.presetId,
@@ -137,8 +140,14 @@ function hydrateVariant(db, variant) {
 
 	return {
 		...variant,
+		__typename: 'Variant',
 		family: family
-			? {id: family.id, name: family.name, template: family.template}
+			? {
+				id: family.id,
+				name: family.name,
+				template: family.template,
+				__typename: 'Family',
+			  }
 			: null,
 		abstractedFont: variant.abstractedFontId
 			? hydrateAbstracted(db, db.abstractedFonts[variant.abstractedFontId])
@@ -157,6 +166,7 @@ function hydrateFamily(db, family) {
 
 	return {
 		...family,
+		__typename: 'Family',
 		variants,
 		from: family.fromId
 			? hydrateAbstracted(db, db.abstractedFonts[family.fromId])
@@ -174,6 +184,7 @@ function hydrateUser(db) {
 
 	return {
 		...user,
+		__typename: 'User',
 		library,
 		libraryMeta: {count: library.length},
 		_libraryMeta: {count: library.length},
@@ -182,6 +193,8 @@ function hydrateUser(db) {
 			.filter(Boolean),
 		manager: null,
 		values: user.appValues,
+		academyProgress: user.academyProgress || {},
+		academyCompleted: !!user.academyCompleted,
 	};
 }
 

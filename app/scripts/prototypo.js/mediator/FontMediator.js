@@ -19,9 +19,7 @@ let mergeTimeoutRef;
 let instance;
 
 const getfsSelection = (weight, italic) =>
-	(weight > 500
-		? 0b0000000000100000
-		: 0b0000000001000000)
+	(weight > 500 ? 0b0000000000100000 : 0b0000000001000000)
 	| (italic ? 0b0000000000000001 : 0b0000000000000000);
 
 window.addEventListener('fluxServer.setup', () => {
@@ -300,6 +298,10 @@ export default class FontMediator {
 	}
 
 	async mergeFont(arrayBuffer) {
+		if (!process.env.MERGE) {
+			return arrayBuffer;
+		}
+
 		const buffer = await mergeFont(
 			MERGE_URL,
 			'mergefont',

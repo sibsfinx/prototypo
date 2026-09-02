@@ -33,6 +33,13 @@ export default class FontPrecursor {
 		};
 
 		this.unicodeToGlyphName = {};
+		this.controlInits = {};
+
+		(fontSrc.controls || []).forEach((group) => {
+			(group.parameters || []).forEach((param) => {
+				this.controlInits[param.name] = param.init;
+			});
+		});
 
 		this.glyphs = _mapValues(fontSrc.glyphs, (glyph) => {
 			if (glyph.name.indexOf('alt') === -1) {
@@ -52,9 +59,13 @@ export default class FontPrecursor {
 	}
 
 	constructFont(params, subset) {
-		let localParams = {
+		const mergedParams = {
+			...this.controlInits,
 			...params,
-			..._mapValues(this.parameters, param => param.getResult(params)),
+		};
+		let localParams = {
+			...mergedParams,
+			..._mapValues(this.parameters, param => param.getResult(mergedParams)),
 			manualChanges: {
 				...this.paramBase.manualChanges,
 				...params.manualChanges,

@@ -1,7 +1,8 @@
-// ES module wrapper for please-wait UMD module
-// Import the UMD script which sets window.pleaseWait
 import './please-wait.js';
 
-// Export what the UMD module sets on window
-export default window.pleaseWait;
+const pleaseWaitApi = {
+	pleaseWait: window.pleaseWait,
+};
+
+export default pleaseWaitApi;
 export const pleaseWait = window.pleaseWait;

@@ -7,8 +7,6 @@ import {
 	IndexRedirect,
 } from 'react-router';
 import {ApolloProvider} from 'react-apollo';
-import {hot} from 'react-hot-loader';
-
 import HoodieApi from './services/hoodie.services';
 
 import LibraryApp from './components/library/library-app.components';
@@ -339,4 +337,4 @@ class AppRoutes extends React.PureComponent {
 	}
 }
 
-export default hot(module)(AppRoutes);
+export default AppRoutes;

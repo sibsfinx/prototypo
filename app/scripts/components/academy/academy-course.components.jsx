@@ -7,6 +7,7 @@ import {findDOMNode} from 'react-dom';
 import InlineSVG from 'svg-inline-react';
 import Button from '../shared/new-button.components';
 import ScrollArea from 'react-scrollbar/dist/no-css';
+import cupSvg from '../../../images/academy/cup.svg?raw';
 
 class AcademyCourse extends React.PureComponent {
 	constructor(props) {
@@ -196,10 +197,10 @@ class AcademyCourse extends React.PureComponent {
 			headers,
 			stickedIndex,
 			scrollPercent: Math.round(
-				event.target.scrollTop
+				(event.target.scrollTop
 					/ (document.getElementsByClassName('academy-course-main')[0]
 						.offsetHeight
-						- 850)
+						- 850))
 					* 100,
 			),
 		});
@@ -282,9 +283,7 @@ class AcademyCourse extends React.PureComponent {
 		if (!src.match(urlRegexp) && this.state.course) {
 			return (
 				<img
-					src={`assets/images/academy/courses/${
-						this.state.course.title
-					}/${src}`}
+					src={`assets/images/academy/courses/${this.state.course.title}/${src}`}
 					alt={alt}
 				/>
 			);
@@ -320,11 +319,7 @@ class AcademyCourse extends React.PureComponent {
 						returnstring = `${returnstring} ${regexResult[0]}`;
 					}
 					else {
-						returnstring = `${returnstring} ${
-							regexResult[1]
-						}="assets/images/academy/courses/${this.state.course.title}/${
-							regexResult[2]
-						}"`;
+						returnstring = `${returnstring} ${regexResult[1]}="assets/images/academy/courses/${this.state.course.title}/${regexResult[2]}"`;
 					}
 				}
 				else {
@@ -536,15 +531,14 @@ class AcademyCourse extends React.PureComponent {
 					<InlineSVG
 						className="academy-course-finish-icon"
 						element="div"
-						src={require('!svg-inline-loader!../../../images/academy/cup.svg')}
+						src={cupSvg}
 					/>
 					<div className="academy-course-finish-text">
 						{this.getNextCourse() ? (
 							<p>
-								Good Job, you have learned {course.objective}
-								. Do you want to learn {this.getNextCourse().objective}
-								? Check out our next course: {this.getNextCourse().title}
-								.
+								Good Job, you have learned {course.objective}. Do you want to
+								learn {this.getNextCourse().objective}? Check out our next
+								course: {this.getNextCourse().title}.
 							</p>
 						) : (
 							<p>

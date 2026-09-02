@@ -472,7 +472,7 @@ export default class GlyphCanvas extends React.PureComponent {
 			this.canvas.clientWidth,
 		);
 
-		if (module.hot) {
+		if (typeof module !== 'undefined' && module.hot) {
 			module.hot.accept('../toile/toile', () => {
 				const ToileConstructor = require('../toile/toile').default; // eslint-disable-line global-require
 				const [z, , , , tx, ty] = this.toile.viewMatrix;
