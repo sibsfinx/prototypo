@@ -25,5 +25,5 @@
 
 - [x] 5.1 Storyboard beats covering library, create, width slider, slant slider
 - [x] 5.2 `yarn test:unit` green
-- [ ] 5.3 Record demo of create + customize
-- [ ] 5.4 Extract frames and verify each beat against the named spec scenario
+- [x] 5.3 Record demo of create + customize
+- [x] 5.4 Extract frames and verify each beat against the named spec scenario
