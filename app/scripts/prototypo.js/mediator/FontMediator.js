@@ -167,6 +167,7 @@ export default class FontMediator {
 	}
 
 	constructor(workerPoolSize, noCanvas = false) {
+		this.workersHaveTemplates = false;
 		this.noCanvas = noCanvas;
 		this.workerPool = new WorkerPool(workerPoolSize || 1);
 		this.initValues = {};
@@ -205,6 +206,7 @@ export default class FontMediator {
 					data: typedatas,
 				},
 				callback: () => {
+					this.workersHaveTemplates = true;
 					clearTimeout(timeoutId);
 					finish();
 				},
@@ -512,6 +514,10 @@ export default class FontMediator {
 			catch (error) {
 				console.error('FontMediator canvas constructFont failed', error);
 			}
+		}
+
+		if (!this.workersHaveTemplates) {
+			return Promise.resolve();
 		}
 
 		return this.getFontObject(fontName, 'Regular', template, params, subset)

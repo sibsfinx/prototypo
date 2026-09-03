@@ -97,10 +97,16 @@ class OnboardingApp extends React.PureComponent {
 	}
 
 	finishOnboarding() {
-		this.props.updateVariant(
-			this.state.family.variants[0].id,
-			this.state.values,
-		);
+		const variantId
+			= this.state.family
+			&& this.state.family.variants
+			&& this.state.family.variants[0]
+			&& this.state.family.variants[0].id;
+
+		if (variantId && this.props.updateVariant) {
+			this.props.updateVariant(variantId, this.state.values);
+		}
+
 		this.props.router.push('/dashboard');
 	}
 
@@ -163,8 +169,11 @@ class OnboardingApp extends React.PureComponent {
 				abstracted ? abstracted.id : undefined,
 			);
 
-			this.setState({creatingFamily: false});
-			this.setState({createFamily: true});
+			this.setState({
+				creatingFamily: false,
+				createFamily: true,
+				family: newFont,
+			});
 			this.client.dispatchAction('/family-created', newFont);
 
 			this.client.dispatchAction('/change-font', {
@@ -806,11 +815,17 @@ export default compose(
 		options: {
 			update: (store, {data: {updateVariant}}) => {
 				const data = store.readQuery({query: libraryQuery});
-				const variant = data.user.library.find(
-					f => f.id === updateVariant.family.id,
-				).variants[0];
+				const family
+					= data
+					&& data.user
+					&& data.user.library
+					&& data.user.library.find(f => f.id === updateVariant.family.id);
 
-				variant.values = updateVariant.values;
+				if (!family || !family.variants || !family.variants[0]) {
+					return;
+				}
+
+				family.variants[0].values = updateVariant.values;
 				store.writeQuery({
 					query: libraryQuery,
 					data,

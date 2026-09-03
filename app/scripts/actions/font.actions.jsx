@@ -188,8 +188,8 @@ export default {
 	},
 	'/family-created': async ({name, variants, template}) => {
 		const patchVariant = prototypoStore
-			.set('variant', variants[0])
-			.set('family', {name, template})
+			.set('variant', variants && variants[0])
+			.set('family', {name, template, variants})
 			.set('uiCreatefamilySelectedTemplate', undefined)
 			.set('openFamilyModal', false)
 			.commit();
@@ -198,24 +198,31 @@ export default {
 
 		saveAppValues();
 
-		const {
-			data: {user},
-		} = await apolloClient.query({
-			query: gql`
-				query getVariantsCount {
-					user {
-						id
-						libraryMeta: _libraryMeta {
-							count
+		try {
+			const result = await apolloClient.query({
+				query: gql`
+					query getVariantsCount {
+						user {
+							id
+							libraryMeta: _libraryMeta {
+								count
+							}
 						}
 					}
-				}
-			`,
-		});
+				`,
+			});
+			const user = result && result.data && result.data.user;
+			const count = user && user.libraryMeta && user.libraryMeta.count;
 
-		window.Intercom('update', {
-			number_of_family: user.libraryMeta.count,
-		});
+			if (typeof window.Intercom === 'function') {
+				window.Intercom('update', {
+					number_of_family: count,
+				});
+			}
+		}
+		catch (error) {
+			console.error('/family-created follow-up failed', error);
+		}
 	},
 	'/select-variant': ({family, selectedVariant = family.variants[0]}) => {
 		localClient.dispatchAction('/change-font', {
