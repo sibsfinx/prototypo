@@ -1,4 +1,4 @@
-import {mkdtempSync, rmSync} from 'fs';
+import {mkdtempSync, rmSync, readFileSync} from 'fs';
 import {tmpdir} from 'os';
 import {join} from 'path';
 import {describe, it, before, after} from 'node:test';
@@ -10,6 +10,11 @@ import {
 	listFamilies,
 	getVariantValues,
 	setParam,
+	setParams,
+	listAlternates,
+	setAlternate,
+	describeOpenTypeSupport,
+	exportOtf,
 } from '../../mcp/lib.mjs';
 
 describe('prototypo MCP handlers', () => {
@@ -89,5 +94,39 @@ describe('prototypo MCP handlers', () => {
 			/Unknown param/,
 		);
 		assert.equal(getVariantValues(variant.id, dbPath).values.notARealParam, undefined);
+	});
+
+	it('lists baked glyph alternates, not OpenType features', () => {
+		const alts = listAlternates('venus.ptf');
+		const a = alts.find((item) => item.char === 'a');
+		assert.ok(a);
+		assert.ok(a.glyphs.some((g) => g.name === 'a_alt'));
+		const ot = describeOpenTypeSupport('venus.ptf');
+		assert.equal(ot.gsub, false);
+		assert.equal(ot.standardLigatures, false);
+	});
+
+	it('bakes an alternate and exports an OTTO file', async () => {
+		const {variant} = createFamily(
+			{name: 'ExportMe', templateName: 'venus.ptf'},
+			dbPath,
+		);
+		setParams({variantId: variant.id, values: {width: 1.1, thickness: 120}}, dbPath);
+		const afterAlt = setAlternate(
+			{variantId: variant.id, unicode: 97, glyphName: 'a_alt'},
+			dbPath,
+		);
+		assert.equal(afterAlt.values.altList['97'], 'a_alt');
+		assert.throws(
+			() => setAlternate({variantId: variant.id, unicode: 97, glyphName: 'nope'}, dbPath),
+			/not an alternate/,
+		);
+
+		const outPath = join(dir, 'ExportMe-Regular.otf');
+		const result = await exportOtf({variantId: variant.id, outPath}, dbPath);
+		assert.equal(result.bytes > 1000, true);
+		assert.equal(result.glyphCount > 50, true);
+		const magic = readFileSync(outPath).subarray(0, 4).toString('ascii');
+		assert.equal(magic, 'OTTO');
 	});
 });

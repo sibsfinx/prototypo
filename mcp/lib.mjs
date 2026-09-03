@@ -256,3 +256,155 @@ export function setParam(
 	saveDb(db, dbPath);
 	return getVariantValues(variantId, dbPath);
 }
+
+export function setParams({variantId, values}, dbPath = defaultDbPath()) {
+	if (!values || typeof values !== 'object') {
+		throw new Error('values is required');
+	}
+	for (const [name, value] of Object.entries(values)) {
+		setParam({variantId, name, value}, dbPath);
+	}
+	return getVariantValues(variantId, dbPath);
+}
+
+export function listAlternates(templateName) {
+	resolveTemplate(templateName);
+	const json = loadFontJson(templateName);
+	const byUnicode = new Map();
+	for (const glyph of Object.values(json.glyphs || {})) {
+		const unicode = Number(glyph.unicode);
+		if (!Number.isFinite(unicode) || unicode <= 0 || !glyph.name) {
+			continue;
+		}
+		const list = byUnicode.get(unicode) || [];
+		list.push(glyph.name);
+		byUnicode.set(unicode, list);
+	}
+
+	return [...byUnicode.entries()]
+		.filter(([, names]) => names.length > 1)
+		.map(([unicode, names]) => {
+			const unique = [...new Set(names)];
+			const defaultName = unique.find((name) => !name.includes('alt')) || unique[0];
+			return {
+				unicode,
+				char: String.fromCodePoint(unicode),
+				defaultName,
+				glyphs: unique.map((name) => ({
+					name,
+					isDefault: name === defaultName,
+				})),
+			};
+		});
+}
+
+export function setAlternate(
+	{variantId, unicode, glyphName},
+	dbPath = defaultDbPath(),
+) {
+	if (!glyphName) {
+		throw new Error('glyphName is required');
+	}
+	const code = Number(unicode);
+	if (!Number.isFinite(code)) {
+		throw new Error('unicode is required');
+	}
+	const db = loadDb(dbPath);
+	const variant = db.variants[variantId];
+	if (!variant) {
+		throw new Error(`Variant not found: ${variantId}`);
+	}
+	const family = db.families[variant.familyId];
+	if (!family) {
+		throw new Error(`Family not found: ${variant.familyId}`);
+	}
+	const json = loadFontJson(family.template);
+	const match = Object.values(json.glyphs || {}).find(
+		(glyph) => glyph.name === glyphName && Number(glyph.unicode) === code,
+	);
+	if (!match) {
+		throw new Error(
+			`Glyph ${glyphName} is not an alternate for unicode ${code}`,
+		);
+	}
+	const altList = {...((variant.values && variant.values.altList) || {})};
+	altList[String(code)] = glyphName;
+	variant.values = {...(variant.values || {}), altList};
+	variant.updatedAt = now();
+	saveDb(db, dbPath);
+	return getVariantValues(variantId, dbPath);
+}
+
+export function describeOpenTypeSupport(templateName) {
+	const alternates = listAlternates(templateName);
+	return {
+		templateName,
+		gsub: false,
+		gposKerning: false,
+		standardLigatures: false,
+		discretionaryLigatures: false,
+		stylisticSets: false,
+		smallCaps: false,
+		figureSets: false,
+		variableFont: false,
+		alternates: {
+			mechanism: 'baked altList, not OpenType salt/ssXX',
+			count: alternates.length,
+			examples: alternates.slice(0, 12).map((item) => ({
+				char: item.char,
+				glyphs: item.glyphs.map((g) => g.name),
+			})),
+		},
+		note:
+			'Exported OTFs are CFF (OTTO) with cmap/hmtx only. CSS font-feature-settings liga/dlig/calt/ss01 will not change glyphs. Pick alternates with set_alternate before export_otf.',
+	};
+}
+
+function slug(value) {
+	return String(value || 'font')
+		.trim()
+		.replace(/\s+/g, '-')
+		.replace(/[^A-Za-z0-9._-]/g, '');
+}
+
+export async function exportOtf(
+	{variantId, outPath},
+	dbPath = defaultDbPath(),
+) {
+	const db = loadDb(dbPath);
+	const variant = db.variants[variantId];
+	if (!variant) {
+		throw new Error(`Variant not found: ${variantId}`);
+	}
+	const family = db.families[variant.familyId];
+	if (!family) {
+		throw new Error(`Family not found: ${variant.familyId}`);
+	}
+	const {buildOtf, writeOtfFile} = await import('./export.mjs');
+	const {buffer, glyphCount} = buildOtf({
+		templateName: family.template,
+		values: variant.values || {},
+		familyName: family.name,
+		styleName: variant.name || 'Regular',
+		weight: variant.weight || 400,
+		width: variant.width || 'normal',
+		italic: Boolean(variant.italic),
+	});
+	const dest
+		= outPath
+		|| join(
+			REPO_ROOT,
+			'mcp/demo/fonts',
+			`${slug(family.name)}-${slug(variant.name || 'Regular')}.otf`,
+		);
+	const path = writeOtfFile(buffer, dest);
+	return {
+		path,
+		bytes: buffer.byteLength,
+		glyphCount,
+		familyName: family.name,
+		styleName: variant.name || 'Regular',
+		templateName: family.template,
+		altList: (variant.values && variant.values.altList) || {},
+	};
+}
