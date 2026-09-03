@@ -491,6 +491,7 @@ export class SliderTextController extends React.PureComponent {
 			<input
 				className={classes}
 				type="number"
+				step="any"
 				value={this.state.isTyping ? value : value.toFixed(2)}
 				onChange={this.handleChange}
 				onClick={this.handleClick}

@@ -126,11 +126,17 @@ async function setSlider(page, label, value) {
 	const input = row.locator('input.slider-text-controller');
 	await input.click();
 	await input.evaluate((el, nextValue) => {
+		el.focus();
+		el.click();
+		const last = el.value;
+		const tracker = el._valueTracker;
+		if (tracker) {
+			tracker.setValue(last);
+		}
 		const setter = Object.getOwnPropertyDescriptor(
 			window.HTMLInputElement.prototype,
 			'value',
 		).set;
-		el.focus();
 		setter.call(el, nextValue);
 		el.dispatchEvent(new Event('input', {bubbles: true}));
 		el.dispatchEvent(new Event('change', {bubbles: true}));
