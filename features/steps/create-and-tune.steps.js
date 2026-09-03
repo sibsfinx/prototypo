@@ -125,9 +125,18 @@ async function setSlider(page, label, value) {
 	await expect(row).toBeVisible({timeout: 30_000});
 	const input = row.locator('input.slider-text-controller');
 	await input.click();
-	await input.fill('');
-	await input.pressSequentially(String(value), {delay: 40});
-	await input.press('Tab');
+	await input.evaluate((el, nextValue) => {
+		const setter = Object.getOwnPropertyDescriptor(
+			window.HTMLInputElement.prototype,
+			'value',
+		).set;
+		el.focus();
+		setter.call(el, nextValue);
+		el.dispatchEvent(new Event('input', {bubbles: true}));
+		el.dispatchEvent(new Event('change', {bubbles: true}));
+		el.blur();
+	}, String(value));
+	await expect(input).toHaveValue(new RegExp(String(value).replace('.', '\\.')));
 	page._lastSlider = {label, value};
 }
 
