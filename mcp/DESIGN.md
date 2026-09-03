@@ -48,7 +48,7 @@ Read `node_modules/<pkg>/dist/font.json` (same sources `scripts/copy-templates` 
 
 ## Security
 
-Local process, local files only. Does not fetch fonts or upload values.
+Local process, local files only. Does not fetch fonts or upload values. `templateName` is allow-listed to the five packages (no path traversal into `node_modules`/elsewhere). `set_param` rejects names that are not in that template's controls.
 
 ## Cursor config
 

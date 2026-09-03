@@ -92,7 +92,16 @@ export function saveDb(db, dbPath = defaultDbPath()) {
 	writeFileSync(dbPath, JSON.stringify(db, null, 2));
 }
 
+export function resolveTemplate(templateName) {
+	const meta = TEMPLATES.find((t) => t.templateName === templateName);
+	if (!meta) {
+		throw new Error(`Unknown templateName: ${templateName}`);
+	}
+	return meta;
+}
+
 export function fontJsonPath(templateName) {
+	resolveTemplate(templateName);
 	return join(REPO_ROOT, 'node_modules', templateName, 'dist', 'font.json');
 }
 
@@ -122,6 +131,7 @@ export function listTemplates() {
 }
 
 export function getControls(templateName) {
+	resolveTemplate(templateName);
 	const json = loadFontJson(templateName);
 	const parameters = [];
 	for (const group of json.controls || []) {
@@ -149,10 +159,7 @@ export function createFamily({name, templateName}, dbPath = defaultDbPath()) {
 	if (!name) {
 		throw new Error('name is required');
 	}
-	const meta = TEMPLATES.find((t) => t.templateName === templateName);
-	if (!meta) {
-		throw new Error(`Unknown templateName: ${templateName}`);
-	}
+	resolveTemplate(templateName);
 	const font = loadFontJson(templateName);
 	const values = controlInits(font.controls);
 	const db = loadDb(dbPath);
@@ -235,6 +242,14 @@ export function setParam(
 	const variant = db.variants[variantId];
 	if (!variant) {
 		throw new Error(`Variant not found: ${variantId}`);
+	}
+	const family = db.families[variant.familyId];
+	if (!family) {
+		throw new Error(`Family not found: ${variant.familyId}`);
+	}
+	const known = controlInits(loadFontJson(family.template).controls);
+	if (!(name in known)) {
+		throw new Error(`Unknown param: ${name}`);
 	}
 	variant.values = {...(variant.values || {}), [name]: value};
 	variant.updatedAt = now();

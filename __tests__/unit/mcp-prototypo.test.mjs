@@ -69,5 +69,25 @@ describe('prototypo MCP handlers', () => {
 			() => createFamily({name: 'x', templateName: 'nope.ptf'}, dbPath),
 			/Unknown templateName/,
 		);
+		assert.throws(
+			() => getControls('../../../tmp/proto-traversal-poc'),
+			/Unknown templateName/,
+		);
+	});
+
+	it('rejects unknown params', () => {
+		const {variant} = createFamily(
+			{name: 'ParamGuard', templateName: 'venus.ptf'},
+			dbPath,
+		);
+		assert.throws(
+			() =>
+				setParam(
+					{variantId: variant.id, name: 'notARealParam', value: 99},
+					dbPath,
+				),
+			/Unknown param/,
+		);
+		assert.equal(getVariantValues(variant.id, dbPath).values.notARealParam, undefined);
 	});
 });
