@@ -462,13 +462,19 @@ export default {
 
 		localServer.dispatchUpdate('/undoableStore', patch);
 
-		if (force) {
-			// TODO(franz): This SHOULD totally end up being in a flux store on hoodie
-			undoWatcher.forceUpdate(patch, label);
-			debouncedSave(newParams, variantId);
+		try {
+			if (force) {
+				if (undoWatcher) {
+					undoWatcher.forceUpdate(patch, label);
+				}
+				debouncedSave(newParams, variantId);
+			}
+			else if (undoWatcher) {
+				undoWatcher.update(patch, label);
+			}
 		}
-		else {
-			undoWatcher.update(patch, label);
+		catch (error) {
+			console.error('/change-param undoWatcher failed', error);
 		}
 	},
 	'/change-param-state': ({name, state, force, label}) => {

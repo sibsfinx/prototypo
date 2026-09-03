@@ -185,13 +185,25 @@ export class Slider extends React.PureComponent {
 
 		this.changeParam = this.changeParam.bind(this);
 		this.resetValue = this.resetValue.bind(this);
+		this.state = {draft: undefined};
 	}
 
 	componentWillMount() {
 		this.client = LocalClient.instance();
 	}
 
+	componentWillReceiveProps(nextProps) {
+		if (
+			this.state.draft !== undefined
+			&& nextProps.value !== undefined
+			&& nextProps.value === this.state.draft
+		) {
+			this.setState({draft: undefined});
+		}
+	}
+
 	resetValue() {
+		this.setState({draft: this.props.init});
 		this.client.dispatchAction('/change-param', {
 			value: this.props.init,
 			name: this.props.name,
@@ -225,6 +237,9 @@ export class Slider extends React.PureComponent {
 	}
 
 	changeParam(params) {
+		if (typeof params.value === 'number' && !Number.isNaN(params.value)) {
+			this.setState({draft: params.value});
+		}
 		this.client.dispatchAction('/change-param', params);
 	}
 
@@ -243,7 +258,12 @@ export class Slider extends React.PureComponent {
 			state,
 			advanced,
 		} = this.props;
-		const value = this.props.value === undefined ? init : this.props.value;
+		const value
+			= this.state.draft !== undefined
+				? this.state.draft
+				: this.props.value === undefined
+					? init
+					: this.props.value;
 
 		const classes = classNames({
 			slider: true,

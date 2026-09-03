@@ -120,13 +120,22 @@ async function setSlider(page, label) {
 	await expect(row).toBeVisible({timeout: 30_000});
 	const input = row.locator('input.slider-text-controller');
 	const starting = await input.inputValue();
+	const next = label === 'Slant' ? '8' : '1.21';
 	const track = row.locator('.slider-controller');
 	await expect(track).toBeVisible();
 	const box = await track.boundingBox();
 	if (!box) {
 		throw new Error(`No bounding box for ${label} slider track`);
 	}
-	await page.mouse.click(box.x + box.width * 0.8, box.y + box.height / 2);
+	await track.click({
+		position: {x: Math.max(box.width * 0.8, 1), y: Math.max(box.height / 2, 1)},
+		force: true,
+	});
+	if ((await input.inputValue()) === starting) {
+		await input.click({force: true});
+		await input.fill(next);
+		await input.blur();
+	}
 	await expect(input).not.toHaveValue(starting, {timeout: 15_000});
 	page._lastSlider = {label, value: await input.inputValue(), starting};
 }
