@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import Lifespan from 'lifespan';
 
 import LocalClient from '../stores/local-client.stores.jsx';
+import {undoableStore} from '../stores/creation.stores.jsx';
 import {indivGroupsEditionTutorialLabel} from '../helpers/joyride.helpers.js';
 import SliderHelpText from '../../images/sliders/helpText.json';
 
@@ -32,6 +33,12 @@ export class Sliders extends React.PureComponent {
 			.onDelete(() => {
 				this.setState({values: undefined});
 			});
+
+		const currentValues = undoableStore.get('controlsValues');
+
+		if (currentValues && Object.keys(currentValues).length) {
+			this.setState({values: currentValues});
+		}
 
 		this.client
 			.getStore('/userStore', this.lifespan)

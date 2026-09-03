@@ -158,7 +158,16 @@ export default {
 			}),
 		);
 
-		const fontValues = await FontValues.get({variantId: variant.id});
+		let savedValues = {};
+
+		try {
+			const fontValues = await FontValues.get({variantId: variant.id});
+
+			savedValues = (fontValues && fontValues.values) || {};
+		}
+		catch (error) {
+			console.error('/change-font FontValues.get failed', error);
+		}
 
 		const patchVariant = prototypoStore
 			.set('variant', variant)
@@ -167,14 +176,9 @@ export default {
 
 		localServer.dispatchUpdate('/prototypoStore', patchVariant);
 
-		const altList = {
-			...typedataJSON.fontinfo.defaultAlts,
-			...fontValues.values.altList,
-		};
-
 		localClient.dispatchAction('/load-values', {
 			...initValues,
-			...fontValues.values,
+			...savedValues,
 		});
 
 		localClient.dispatchAction('/clear-undo-stack');

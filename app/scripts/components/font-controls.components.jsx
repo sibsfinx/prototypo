@@ -3,6 +3,7 @@ import Lifespan from 'lifespan';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import LocalClient from '../stores/local-client.stores.jsx';
+import {prototypoStore} from '../stores/creation.stores.jsx';
 
 import {ControlsTabs, ControlsTab} from './controls-tabs.components.jsx';
 import {Sliders} from './sliders.components.jsx';
@@ -28,7 +29,7 @@ export default class FontControls extends React.PureComponent {
 			const data = headJS.d || headJS;
 
 			this.setState({
-				tabControls: data.fontTab,
+				tabControls: data.fontTab || 'Func',
 				credits: data.credits,
 				parameters: data.fontParameters || [],
 				typeface: data.variant,
@@ -39,6 +40,18 @@ export default class FontControls extends React.PureComponent {
 				advancedMode: data.advancedMode,
 			});
 		};
+
+		apply({
+			fontTab: prototypoStore.get('fontTab'),
+			credits: prototypoStore.get('credits'),
+			fontParameters: prototypoStore.get('fontParameters'),
+			variant: prototypoStore.get('variant'),
+			indivMode: prototypoStore.get('indivMode'),
+			indivEditingParams: prototypoStore.get('indivEditingParams'),
+			indivCurrentGroup: prototypoStore.get('indivCurrentGroup'),
+			uiSliderTooltip: prototypoStore.get('uiSliderTooltip'),
+			advancedMode: prototypoStore.get('advancedMode'),
+		});
 
 		const snapshot = await this.client.fetch('/prototypoStore');
 

@@ -8,6 +8,7 @@ import 'react-tippy/dist/tippy.css';
 import onboardingData from '../../data/onboarding.data';
 import apolloClient from '../../services/graphcool.services';
 import LocalClient from '../../stores/local-client.stores';
+import {prototypoStore} from '../../stores/creation.stores';
 
 import Button from '../shared/new-button.components';
 import Step from './step.components';
@@ -175,6 +176,21 @@ class OnboardingApp extends React.PureComponent {
 				family: newFont,
 			});
 			this.client.dispatchAction('/family-created', newFont);
+
+			const templateData = (prototypoStore.get('templatesData') || []).find(
+				t => t.name === this.state.selectedTemplate,
+			);
+
+			if (templateData && templateData.json) {
+				this.client.dispatchAction('/load-params', {
+					controls: templateData.json.controls,
+					presets: templateData.json.presets,
+				});
+				this.client.dispatchAction('/load-values', {
+					...templateData.initValues,
+					...(this.state.selectedValues || {}),
+				});
+			}
 
 			this.client.dispatchAction('/change-font', {
 				templateToLoad: newFont.template,
