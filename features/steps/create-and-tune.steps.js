@@ -126,21 +126,35 @@ async function setSlider(page, label, value) {
 	const input = row.locator('input.slider-text-controller');
 	await input.click();
 	await input.evaluate((el, nextValue) => {
-		el.focus();
-		el.click();
-		const last = el.value;
-		const tracker = el._valueTracker;
-		if (tracker) {
-			tracker.setValue(last);
+		const handlerKey = Object.keys(el).find(
+			k =>
+				k.startsWith('__reactEventHandlers')
+				|| k.startsWith('__reactProps'),
+		);
+		const fiberKey = Object.keys(el).find(
+			k =>
+				k.startsWith('__reactInternalInstance')
+				|| k.startsWith('__reactFiber'),
+		);
+		const fiber = fiberKey ? el[fiberKey] : null;
+		const handlers
+			= (handlerKey && el[handlerKey])
+			|| (fiber && fiber.memoizedProps)
+			|| (fiber && fiber._currentElement && fiber._currentElement.props)
+			|| {};
+		const fakeEvent = {
+			target: {value: nextValue},
+			currentTarget: {value: nextValue},
+		};
+		if (handlers.onClick) {
+			handlers.onClick(fakeEvent);
 		}
-		const setter = Object.getOwnPropertyDescriptor(
-			window.HTMLInputElement.prototype,
-			'value',
-		).set;
-		setter.call(el, nextValue);
-		el.dispatchEvent(new Event('input', {bubbles: true}));
-		el.dispatchEvent(new Event('change', {bubbles: true}));
-		el.blur();
+		if (handlers.onChange) {
+			handlers.onChange(fakeEvent);
+		}
+		if (handlers.onBlur) {
+			handlers.onBlur(fakeEvent);
+		}
 	}, String(value));
 	await expect(input).toHaveValue(new RegExp(String(value).replace('.', '\\.')));
 	page._lastSlider = {label, value};
