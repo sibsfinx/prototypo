@@ -24,3 +24,4 @@ test-results
 blob-report
 playwright/.cache
 .prototypo-local-db.json
+mcp/demo/prototypo-demo-db.json

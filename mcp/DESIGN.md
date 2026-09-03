@@ -21,7 +21,7 @@ Phase 1 uses a **file** with the same JSON shape as `app/scripts/services/local-
 - `PROTOTYPO_DB_PATH` or `~/.prototypo/prototypo-local-db.json`
 - Same records: `user`, `families`, `variants`, …
 
-To use those families in the Vite app, paste/import that JSON into localStorage (phase 2 could add a tiny import hook). Export OTF is phase 2 (needs FontMediator workers).
+To use those families in the Vite app, paste/import that JSON into localStorage. Node export does **not** need FontMediator workers.
 
 ## Templates
 
@@ -45,6 +45,15 @@ Read `node_modules/<pkg>/dist/font.json` (same sources `scripts/copy-templates` 
 | `list_families` | — | families with variant ids |
 | `get_variant_values` | `variantId` | stored `values` |
 | `set_param` | `variantId`, `name`, `value` | updated values |
+| `set_params` | `variantId`, `values` | updated values |
+| `list_alternates` | `templateName` | unicodes with `_alt` glyphs |
+| `set_alternate` | `variantId`, `unicode`, `glyphName` | values with baked `altList` |
+| `describe_opentype` | `templateName` | honest GSUB/liga/ssXX report (usually none) |
+| `export_otf` | `variantId`, optional `outPath` | path + byte size of an unmerged CFF OTF |
+
+`export_otf` runs `FontPrecursor` + `fontToSfntTable` in Node. No `merge.prototypo.io`. No GSUB: CSS `liga`/`dlig`/`ss01` will not change glyphs. Alternates must be baked with `set_alternate` first.
+
+Specimen: `pnpm mcp:demo` writes `mcp/demo/fonts/*.otf`. Open `mcp/demo/index.html`.
 
 ## Security
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import './register-app.mjs';
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {z} from 'zod';
@@ -9,6 +10,11 @@ import {
 	listFamilies,
 	getVariantValues,
 	setParam,
+	setParams,
+	listAlternates,
+	setAlternate,
+	describeOpenTypeSupport,
+	exportOtf,
 	defaultDbPath,
 } from './lib.mjs';
 
@@ -29,7 +35,7 @@ const dbPath = defaultDbPath();
 
 const server = new McpServer({
 	name: 'prototypo',
-	version: '1.0.0',
+	version: '1.1.0',
 });
 
 server.tool('list_templates', 'List parametric base fonts (Spectral, Grotesk, …)', {}, async () =>
@@ -96,6 +102,86 @@ server.tool(
 	async ({variantId, name, value}) => {
 		try {
 			return text(setParam({variantId, name, value}, dbPath));
+		}
+		catch (error) {
+			return fail(error);
+		}
+	},
+);
+
+server.tool(
+	'set_params',
+	'Set several parametric sliders at once',
+	{
+		variantId: z.string(),
+		values: z.record(z.string(), z.number()),
+	},
+	async ({variantId, values}) => {
+		try {
+			return text(setParams({variantId, values}, dbPath));
+		}
+		catch (error) {
+			return fail(error);
+		}
+	},
+);
+
+server.tool(
+	'list_alternates',
+	'Glyphs that share a unicode (a / a_alt). These are NOT OpenType stylistic sets.',
+	{templateName: z.string()},
+	async ({templateName}) => {
+		try {
+			return text(listAlternates(templateName));
+		}
+		catch (error) {
+			return fail(error);
+		}
+	},
+);
+
+server.tool(
+	'set_alternate',
+	'Bake an alternate glyph into a variant (altList). Must run before export_otf.',
+	{
+		variantId: z.string(),
+		unicode: z.number(),
+		glyphName: z.string(),
+	},
+	async ({variantId, unicode, glyphName}) => {
+		try {
+			return text(setAlternate({variantId, unicode, glyphName}, dbPath));
+		}
+		catch (error) {
+			return fail(error);
+		}
+	},
+);
+
+server.tool(
+	'describe_opentype',
+	'Honest report of OpenType features this template can export (usually: none; alts are baked).',
+	{templateName: z.string()},
+	async ({templateName}) => {
+		try {
+			return text(describeOpenTypeSupport(templateName));
+		}
+		catch (error) {
+			return fail(error);
+		}
+	},
+);
+
+server.tool(
+	'export_otf',
+	'Build an unmerged CFF OpenType file for a variant (no GSUB/liga). Writes under the repo.',
+	{
+		variantId: z.string(),
+		outPath: z.string().optional(),
+	},
+	async ({variantId, outPath}) => {
+		try {
+			return text(await exportOtf({variantId, outPath}, dbPath));
 		}
 		catch (error) {
 			return fail(error);
