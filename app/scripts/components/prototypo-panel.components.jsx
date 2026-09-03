@@ -38,36 +38,49 @@ export default class PrototypoPanel extends React.Component {
 		this.client = LocalClient.instance();
 		this.lifespan = new Lifespan();
 
+		const apply = (headJS) => {
+			const data = headJS.d || headJS;
+
+			this.setState({
+				glyphs: data.glyphs,
+				glyphSelected: data.glyphSelected,
+				uiMode:
+					data.uiMode && data.uiMode.length
+						? data.uiMode
+						: ['glyph', 'word', 'text'],
+				uiText: data.uiText,
+				uiWord: data.uiWord,
+				uiZoom: data.uiZoom,
+				uiPos: data.uiPos,
+				uiNodes: data.uiNodes,
+				uiOutline: data.uiOutline,
+				uiRuler: data.uiRuler,
+				uiCoords: data.uiCoords,
+				uiShadow: data.uiShadow,
+				uiInvertedTextView: data.uiInvertedTextView,
+				uiInvertedTextColors: data.uiInvertedTextColors,
+				uiTextFontSize: data.uiTextFontSize,
+				uiInvertedWordView: data.uiInvertedWordView,
+				uiInvertedWordColors: data.uiInvertedWordColors,
+				uiDependencies: data.uiDependencies,
+				editingGroup: data.indivEdit,
+				indivMode: data.indivMode,
+				wordPanelHeight: data.wordPanelHeight || 20,
+				canvasPanelWidth: data.canvasPanelWidth || 50,
+				indivCurrentGroup: data.indivCurrentGroup,
+				openRestrictedFeature: data.openRestrictedFeature,
+				restrictedFeatureHovered: data.restrictedFeatureHovered,
+			});
+		};
+
+		const snapshot = await this.client.fetch('/prototypoStore');
+
+		apply(snapshot.head.toJS());
+
 		this.client
 			.getStore('/prototypoStore', this.lifespan)
 			.onUpdate((head) => {
-				this.setState({
-					glyphs: head.toJS().d.glyphs,
-					glyphSelected: head.toJS().d.glyphSelected,
-					uiMode: head.toJS().d.uiMode,
-					uiText: head.toJS().d.uiText,
-					uiWord: head.toJS().d.uiWord,
-					uiZoom: head.toJS().d.uiZoom,
-					uiPos: head.toJS().d.uiPos,
-					uiNodes: head.toJS().d.uiNodes,
-					uiOutline: head.toJS().d.uiOutline,
-					uiRuler: head.toJS().d.uiRuler,
-					uiCoords: head.toJS().d.uiCoords,
-					uiShadow: head.toJS().d.uiShadow,
-					uiInvertedTextView: head.toJS().d.uiInvertedTextView,
-					uiInvertedTextColors: head.toJS().d.uiInvertedTextColors,
-					uiTextFontSize: head.toJS().d.uiTextFontSize,
-					uiInvertedWordView: head.toJS().d.uiInvertedWordView,
-					uiInvertedWordColors: head.toJS().d.uiInvertedWordColors,
-					uiDependencies: head.toJS().d.uiDependencies,
-					editingGroup: head.toJS().d.indivEdit,
-					indivMode: head.toJS().d.indivMode,
-					wordPanelHeight: head.toJS().d.wordPanelHeight || 20,
-					canvasPanelWidth: head.toJS().d.canvasPanelWidth || 50,
-					indivCurrentGroup: head.toJS().d.indivCurrentGroup,
-					openRestrictedFeature: head.toJS().d.openRestrictedFeature,
-					restrictedFeatureHovered: head.toJS().d.restrictedFeatureHovered,
-				});
+				apply(head.toJS());
 			})
 			.onDelete(() => {
 				this.setState({glyph: undefined});
