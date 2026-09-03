@@ -11,11 +11,6 @@ const TEMPLATES = [
 	'Prototypo Fell',
 ];
 
-const SLIDER_TARGETS = {
-	Width: '1.15',
-	Slant: '8',
-};
-
 const LIBRARY_WAIT_MS = process.env.CI ? 180_000 : 60_000;
 
 async function stubThirdParties(page) {
@@ -116,7 +111,7 @@ async function sliderRow(page, label) {
 	});
 }
 
-async function setSlider(page, label, value) {
+async function setSlider(page, label) {
 	if (!page.url().includes('dashboard')) {
 		await createFromGrotesk(page, `Tune${label}`);
 	}
@@ -124,40 +119,16 @@ async function setSlider(page, label, value) {
 	const row = await sliderRow(page, label);
 	await expect(row).toBeVisible({timeout: 30_000});
 	const input = row.locator('input.slider-text-controller');
-	await input.click();
-	await input.evaluate((el, nextValue) => {
-		const handlerKey = Object.keys(el).find(
-			k =>
-				k.startsWith('__reactEventHandlers')
-				|| k.startsWith('__reactProps'),
-		);
-		const fiberKey = Object.keys(el).find(
-			k =>
-				k.startsWith('__reactInternalInstance')
-				|| k.startsWith('__reactFiber'),
-		);
-		const fiber = fiberKey ? el[fiberKey] : null;
-		const handlers
-			= (handlerKey && el[handlerKey])
-			|| (fiber && fiber.memoizedProps)
-			|| (fiber && fiber._currentElement && fiber._currentElement.props)
-			|| {};
-		const fakeEvent = {
-			target: {value: nextValue},
-			currentTarget: {value: nextValue},
-		};
-		if (handlers.onClick) {
-			handlers.onClick(fakeEvent);
-		}
-		if (handlers.onChange) {
-			handlers.onChange(fakeEvent);
-		}
-		if (handlers.onBlur) {
-			handlers.onBlur(fakeEvent);
-		}
-	}, String(value));
-	await expect(input).toHaveValue(new RegExp(String(value).replace('.', '\\.')));
-	page._lastSlider = {label, value};
+	const starting = await input.inputValue();
+	const track = row.locator('.slider-controller');
+	await expect(track).toBeVisible();
+	const box = await track.boundingBox();
+	if (!box) {
+		throw new Error(`No bounding box for ${label} slider track`);
+	}
+	await page.mouse.click(box.x + box.width * 0.8, box.y + box.height / 2);
+	await expect(input).not.toHaveValue(starting, {timeout: 15_000});
+	page._lastSlider = {label, value: await input.inputValue(), starting};
 }
 
 When('a user with a local session opens {string}', async ({page}, hash) => {
@@ -244,14 +215,14 @@ Then(
 When(
 	'the user sets the Width slider to a value other than its starting value',
 	async ({page}) => {
-		await setSlider(page, 'Width', SLIDER_TARGETS.Width);
+		await setSlider(page, 'Width');
 	},
 );
 
 When(
 	'the user sets the Slant slider to a value other than its starting value',
 	async ({page}) => {
-		await setSlider(page, 'Slant', SLIDER_TARGETS.Slant);
+		await setSlider(page, 'Slant');
 	},
 );
 
@@ -259,9 +230,9 @@ Then(
 	'the Width control shows the new value and the word preview remains visible',
 	async ({page}) => {
 		const row = await sliderRow(page, 'Width');
-		await expect(row.locator('input.slider-text-controller')).toHaveValue(
-			/1\.15/,
-		);
+		const input = row.locator('input.slider-text-controller');
+		const starting = (page._lastSlider && page._lastSlider.starting) || '1.00';
+		await expect(input).not.toHaveValue(starting);
 		await expect(page.locator('.prototypo-word')).toBeVisible();
 		const box = await page.locator('.prototypo-word').boundingBox();
 		expect(box?.width || 0).toBeGreaterThan(20);
@@ -273,9 +244,9 @@ Then(
 	'the Slant control shows the new value and the word preview remains visible',
 	async ({page}) => {
 		const row = await sliderRow(page, 'Slant');
-		await expect(row.locator('input.slider-text-controller')).toHaveValue(
-			/^8(\.00)?$/,
-		);
+		const input = row.locator('input.slider-text-controller');
+		const starting = (page._lastSlider && page._lastSlider.starting) || '0.00';
+		await expect(input).not.toHaveValue(starting);
 		await expect(page.locator('.prototypo-word')).toBeVisible();
 		const box = await page.locator('.prototypo-word').boundingBox();
 		expect(box?.width || 0).toBeGreaterThan(20);

@@ -2,8 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
 
-import DOM from '../helpers/dom.helpers';
-
 export default class SliderController extends React.PureComponent {
 	constructor(props) {
 		super(props);
@@ -12,7 +10,7 @@ export default class SliderController extends React.PureComponent {
 			tracking: false,
 		};
 
-		// function bindings
+		this.valueAtClientX = this.valueAtClientX.bind(this);
 		this.handleDown = this.handleDown.bind(this);
 		this.handleUp = this.handleUp.bind(this);
 		this.handleMove = this.handleMove.bind(this);
@@ -31,21 +29,33 @@ export default class SliderController extends React.PureComponent {
 		document.removeEventListener('selectstart', this.handleSelectstart);
 	}
 
-	handleDown(e) {
-		const {min, max, label, name, disabled, changeParam} = this.props;
+	valueAtClientX(clientX) {
+		const {min, max} = this.props;
 
-		if (disabled) {
+		if (!this.node) {
+			return min;
+		}
+
+		const rect = this.node.getBoundingClientRect();
+		const width = rect.width || 1;
+		const ratio = (clientX - rect.left) / width;
+
+		return Math.min(Math.max(ratio * (max - min) + min, min), max);
+	}
+
+	handleDown(e) {
+		const {label, name, disabled, changeParam} = this.props;
+
+		if (disabled || !this.node) {
 			return;
 		}
 
+		this.tracking = true;
 		this.setState({tracking: true});
-		const newX = e.pageX || e.screenX;
-		const {offsetLeft} = DOM.getAbsOffset(this.node);
-		let newValue
-			= (newX - offsetLeft) / this.node.offsetWidth * (max - min) + min;
+		const newX = e.clientX;
+		const newValue = this.valueAtClientX(newX);
 
-		newValue = Math.min(Math.max(newValue, min), max);
-
+		this.liveValue = newValue;
 		changeParam({value: newValue, name, label});
 		this.currentX = newX;
 
@@ -53,12 +63,15 @@ export default class SliderController extends React.PureComponent {
 	}
 
 	handleUp(e) {
-		if (!this.state.tracking) {
+		if (!this.tracking && !this.state.tracking) {
 			return;
 		}
 
-		const {value, name, label, changeParam} = this.props;
+		const {name, label, changeParam} = this.props;
+		const value
+			= this.liveValue !== undefined ? this.liveValue : this.props.value;
 
+		this.tracking = false;
 		this.setState({tracking: false});
 		changeParam({value, name, label, force: true});
 
@@ -66,35 +79,30 @@ export default class SliderController extends React.PureComponent {
 	}
 
 	handleMove(e) {
-		if (!this.state.tracking) {
+		if (!this.tracking && !this.state.tracking) {
 			return;
 		}
 
-		const {min, max, value, name, changeParam} = this.props;
-
-		const newX = e.pageX || e.screenX;
-		const {offsetLeft} = DOM.getAbsOffset(this.node);
+		const {min, max, name, changeParam} = this.props;
+		const rect = this.node.getBoundingClientRect();
+		const newX = e.clientX;
 		let newValue;
 
-		if (newX >= offsetLeft && newX <= offsetLeft + this.node.clientWidth) {
-			const variation
-				= (newX - this.currentX) / this.node.offsetWidth * (max - min);
-
-			newValue = value + variation;
-
-			newValue = Math.min(Math.max(newValue, min), max);
+		if (newX >= rect.left && newX <= rect.right) {
+			newValue = this.valueAtClientX(newX);
 		}
 		else {
-			newValue = newX < offsetLeft ? min : max;
+			newValue = newX < rect.left ? min : max;
 		}
 
+		this.liveValue = newValue;
 		changeParam({value: newValue, name});
 		this.currentX = newX;
 	}
 
 	// This prevents preview text to be selected whil using the sliders
 	handleSelectstart(e) {
-		if (this.state.tracking) {
+		if (this.tracking || this.state.tracking) {
 			e.preventDefault();
 		}
 	}
@@ -109,7 +117,7 @@ export default class SliderController extends React.PureComponent {
 			= typeof this.props.maxAdvised === 'number' ? this.props.maxAdvised : max;
 
 		const translateX
-			= (max - Math.min(Math.max(value, min), max)) / (max - min) * ratio;
+			= ((max - Math.min(Math.max(value, min), max)) / (max - min)) * ratio;
 
 		const transform = {
 			transform: `translateX(-${translateX}%)`,

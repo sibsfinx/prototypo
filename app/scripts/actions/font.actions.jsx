@@ -423,7 +423,7 @@ export default {
 		const variantId = (prototypoStore.get('variant') || {}).id;
 		const currentGroupName = (prototypoStore.get('indivCurrentGroup') || {})
 			.name;
-		let newParams = {...undoableStore.get('controlsValues')};
+		let newParams = _cloneDeep(undoableStore.get('controlsValues') || {});
 
 		if (indivMode && indivEdit && !values) {
 			if (newParams.indiv_group_param[currentGroupName][name]) {

@@ -24,10 +24,18 @@ export class Sliders extends React.PureComponent {
 		this.client
 			.getStore('/undoableStore', this.lifespan)
 			.onUpdate((head) => {
-				const headJS = head.toJS().d;
+				const fromStore = undoableStore.get('controlsValues');
+
+				if (fromStore && Object.keys(fromStore).length) {
+					this.setState({values: fromStore});
+					return;
+				}
+
+				const js = head && typeof head.toJS === 'function' ? head.toJS() : {};
+				const data = js.d || js;
 
 				this.setState({
-					values: headJS.controlsValues,
+					values: data.controlsValues,
 				});
 			})
 			.onDelete(() => {
