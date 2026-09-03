@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {controlInitsFromControls} from '../../app/scripts/prototypo.js/precursor/control-inits.js';
+import {controlInitsFromControls} from '../../app/scripts/prototypo.js/precursor/control-inits.ts';
 
 test('control inits are collected from template controls', () => {
 	const inits = controlInitsFromControls([

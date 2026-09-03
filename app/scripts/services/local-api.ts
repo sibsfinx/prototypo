@@ -4,17 +4,127 @@ const STORAGE_KEY = 'prototypo-local-db';
 
 export const LOCAL_TOKEN = 'local-prototypo-token';
 
-function now() {
+interface Preset {
+	id: string;
+	[key: string]: unknown;
+}
+
+interface AbstractedFont {
+	id: string;
+	type?: string;
+	name?: string;
+	template?: string | null;
+	variantId?: string | null;
+	presetId?: string | null;
+	updatedAt?: string;
+	[key: string]: unknown;
+}
+
+interface Variant {
+	id: string;
+	familyId: string;
+	name: string;
+	values: Record<string, unknown>;
+	width: string;
+	weight: number;
+	italic: boolean;
+	updatedAt: string;
+	abstractedFontId: string | null;
+	[key: string]: unknown;
+}
+
+interface Family {
+	id: string;
+	name: string;
+	template: string;
+	ownerId: string;
+	designer: string;
+	designerUrl: string;
+	foundry: string;
+	foundryUrl: string;
+	tags: string[];
+	fromId: string | null;
+	variantIds: string[];
+	updatedAt: string;
+	[key: string]: unknown;
+}
+
+interface User {
+	id: string;
+	email: string;
+	firstName: string;
+	lastName: string;
+	stripe: null;
+	manager: null;
+	appValues: Record<string, unknown>;
+	firstContactMade: boolean;
+	academyProgress: Record<string, unknown>;
+	academyCompleted: boolean;
+	libraryAccessToken: string;
+	libraryIds: string[];
+	favouriteIds: string[];
+	fontInUses: unknown[];
+	hostedDomains: unknown[];
+	[key: string]: unknown;
+}
+
+interface LocalDb {
+	user: User;
+	families: Record<string, Family>;
+	variants: Record<string, Variant>;
+	abstractedFonts: Record<string, AbstractedFont>;
+	presets: Preset[];
+}
+
+interface GraphQLValueNode {
+	kind: string;
+	name?: {value: string};
+	value?: string | number | boolean;
+	values?: GraphQLValueNode[];
+	fields?: Array<{name: {value: string}; value: GraphQLValueNode}>;
+}
+
+interface GraphQLArgument {
+	name: {value: string};
+	value: GraphQLValueNode;
+}
+
+interface GraphQLField {
+	kind: string;
+	name: {value: string};
+	alias?: {value: string};
+	arguments?: GraphQLArgument[];
+}
+
+interface GraphQLOperationDefinition {
+	kind: 'OperationDefinition';
+	selectionSet: {
+		selections: GraphQLField[];
+	};
+}
+
+interface GraphQLDocument {
+	definitions: Array<GraphQLOperationDefinition | {kind: string}>;
+}
+
+type ResolverArgs = Record<string, unknown>;
+type ResolverResult = unknown;
+type RootResolver = (
+	_parent: unknown,
+	args: ResolverArgs,
+) => ResolverResult;
+
+function now(): string {
 	return new Date().toISOString();
 }
 
-function uid(prefix = 'id') {
+function uid(prefix = 'id'): string {
 	return `${prefix}_${Date.now().toString(36)}_${Math.random()
 		.toString(36)
 		.slice(2, 10)}`;
 }
 
-function seedDb() {
+function seedDb(): LocalDb {
 	return {
 		user: {
 			id: 'local-user',
@@ -40,12 +150,12 @@ function seedDb() {
 	};
 }
 
-function loadDb() {
+function loadDb(): LocalDb {
 	try {
 		const raw = window.localStorage.getItem(STORAGE_KEY);
 
 		if (raw) {
-			return JSON.parse(raw);
+			return JSON.parse(raw) as LocalDb;
 		}
 	}
 	catch (err) {
@@ -58,22 +168,25 @@ function loadDb() {
 	return db;
 }
 
-function saveDb(db) {
+function saveDb(db: LocalDb): void {
 	window.localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
 }
 
-function valueFromAST(node, variables = {}) {
+function valueFromAST(
+	node: GraphQLValueNode | undefined,
+	variables: Record<string, unknown> = {},
+): unknown {
 	if (!node) {
 		return undefined;
 	}
 
 	switch (node.kind) {
 	case 'Variable':
-		return variables[node.name.value];
+		return variables[node.name?.value ?? ''];
 	case 'IntValue':
-		return parseInt(node.value, 10);
+		return parseInt(String(node.value), 10);
 	case 'FloatValue':
-		return parseFloat(node.value);
+		return parseFloat(String(node.value));
 	case 'StringValue':
 		return node.value;
 	case 'BooleanValue':
@@ -83,11 +196,11 @@ function valueFromAST(node, variables = {}) {
 	case 'EnumValue':
 		return node.value;
 	case 'ListValue':
-		return node.values.map(value => valueFromAST(value, variables));
+		return (node.values || []).map(value => valueFromAST(value, variables));
 	case 'ObjectValue': {
-		const obj = {};
+		const obj: Record<string, unknown> = {};
 
-		node.fields.forEach((field) => {
+		(node.fields || []).forEach((field) => {
 			obj[field.name.value] = valueFromAST(field.value, variables);
 		});
 		return obj;
@@ -97,8 +210,11 @@ function valueFromAST(node, variables = {}) {
 	}
 }
 
-function getArgs(field, variables) {
-	const args = {};
+function getArgs(
+	field: GraphQLField,
+	variables: Record<string, unknown>,
+): ResolverArgs {
+	const args: ResolverArgs = {};
 
 	(field.arguments || []).forEach((arg) => {
 		args[arg.name.value] = valueFromAST(arg.value, variables);
@@ -106,13 +222,17 @@ function getArgs(field, variables) {
 	return args;
 }
 
-function getOperation(query) {
-	return (query.definitions || []).find(
-		definition => definition.kind === 'OperationDefinition',
+function getOperation(query: GraphQLDocument): GraphQLOperationDefinition | undefined {
+	return query.definitions.find(
+		(definition): definition is GraphQLOperationDefinition =>
+			definition.kind === 'OperationDefinition',
 	);
 }
 
-function hydrateAbstracted(db, abstracted) {
+function hydrateAbstracted(
+	db: LocalDb,
+	abstracted: AbstractedFont | null | undefined,
+): Record<string, unknown> | null {
 	if (!abstracted) {
 		return null;
 	}
@@ -131,7 +251,10 @@ function hydrateAbstracted(db, abstracted) {
 	};
 }
 
-function hydrateVariant(db, variant) {
+function hydrateVariant(
+	db: LocalDb,
+	variant: Variant | null | undefined,
+): Record<string, unknown> | null {
 	if (!variant) {
 		return null;
 	}
@@ -155,7 +278,10 @@ function hydrateVariant(db, variant) {
 	};
 }
 
-function hydrateFamily(db, family) {
+function hydrateFamily(
+	db: LocalDb,
+	family: Family | null | undefined,
+): Record<string, unknown> | null {
 	if (!family) {
 		return null;
 	}
@@ -176,7 +302,7 @@ function hydrateFamily(db, family) {
 	};
 }
 
-function hydrateUser(db) {
+function hydrateUser(db: LocalDb): Record<string, unknown> {
 	const {user} = db;
 	const library = (user.libraryIds || [])
 		.map(id => hydrateFamily(db, db.families[id]))
@@ -198,9 +324,22 @@ function hydrateUser(db) {
 	};
 }
 
-function createVariantRecord(db, familyId, input = {}) {
+interface VariantInput {
+	name?: string;
+	values?: Record<string, unknown>;
+	width?: string;
+	weight?: number;
+	italic?: boolean;
+	abstractedFontId?: string | null;
+}
+
+function createVariantRecord(
+	db: LocalDb,
+	familyId: string,
+	input: VariantInput = {},
+): Variant {
 	const id = uid('variant');
-	const variant = {
+	const variant: Variant = {
 		id,
 		familyId,
 		name: input.name || 'Regular',
@@ -216,12 +355,26 @@ function createVariantRecord(db, familyId, input = {}) {
 	return variant;
 }
 
-function createFamilyRecord(db, args = {}) {
+interface FamilyInput extends ResolverArgs {
+	name?: string;
+	template?: string;
+	ownerId?: string;
+	designer?: string;
+	designerUrl?: string;
+	foundry?: string;
+	foundryUrl?: string;
+	tags?: string[];
+	fromId?: string | null;
+	abstractedFontId?: string | null;
+	variants?: VariantInput[];
+}
+
+function createFamilyRecord(db: LocalDb, args: FamilyInput = {}): Family {
 	const id = uid('family');
-	const family = {
+	const family: Family = {
 		id,
-		name: args.name,
-		template: args.template,
+		name: args.name || '',
+		template: args.template || '',
 		ownerId: args.ownerId || db.user.id,
 		designer: args.designer || '',
 		designerUrl: args.designerUrl || '',
@@ -252,69 +405,83 @@ function createFamilyRecord(db, args = {}) {
 	return family;
 }
 
-function matchesFilter(item, filter) {
+function matchesFilter(
+	item: Record<string, unknown>,
+	filter: Record<string, unknown> | undefined,
+): boolean {
 	if (!filter) {
 		return true;
 	}
 
 	return Object.keys(filter).every((key) => {
 		const expected = filter[key];
+		const itemValue = item[key];
 
 		if (expected && typeof expected === 'object' && !Array.isArray(expected)) {
-			return matchesFilter(item[key] || {}, expected);
+			return matchesFilter(
+				(itemValue as Record<string, unknown>) || {},
+				expected as Record<string, unknown>,
+			);
 		}
 
-		return item[key] === expected;
+		return itemValue === expected;
 	});
 }
 
-const rootResolvers = {
+const rootResolvers: Record<string, RootResolver> = {
 	user() {
 		return hydrateUser(loadDb());
 	},
-	Variant(_, args) {
+	Variant(_parent, args) {
 		const db = loadDb();
 
-		return hydrateVariant(db, db.variants[args.id]);
+		return hydrateVariant(db, db.variants[args.id as string]);
 	},
-	allPresets(_, args) {
+	allPresets(_parent, args) {
 		const db = loadDb();
 
-		return db.presets.filter(preset => matchesFilter(preset, args.filter));
+		return db.presets.filter(preset =>
+			matchesFilter(preset, args.filter as Record<string, unknown>),
+		);
 	},
-	allAbstractedFonts(_, args) {
+	allAbstractedFonts(_parent, args) {
 		const db = loadDb();
 		const fonts = Object.values(db.abstractedFonts);
 
 		return fonts
-			.filter(font => matchesFilter(font, args.filter || args.where))
+			.filter(font =>
+				matchesFilter(
+					font,
+					(args.filter || args.where) as Record<string, unknown>,
+				),
+			)
 			.map(font => hydrateAbstracted(db, font));
 	},
-	createFamily(_, args) {
+	createFamily(_parent, args) {
 		const db = loadDb();
-		const family = createFamilyRecord(db, args);
+		const family = createFamilyRecord(db, args as FamilyInput);
 
 		saveDb(db);
 		return hydrateFamily(db, family);
 	},
-	createVariant(_, args) {
+	createVariant(_parent, args) {
 		const db = loadDb();
-		const family = db.families[args.familyId];
+		const family = db.families[args.familyId as string];
 
 		if (!family) {
 			throw new Error('Family not found');
 		}
 
-		const variant = createVariantRecord(db, family.id, args);
+		const variant = createVariantRecord(db, family.id, args as VariantInput);
 
 		family.variantIds.push(variant.id);
 		family.updatedAt = now();
 		saveDb(db);
 		return hydrateVariant(db, variant);
 	},
-	updateVariant(_, args) {
+	updateVariant(_parent, args) {
 		const db = loadDb();
-		const variant = db.variants[args.id];
+		const variant = db.variants[args.id as string];
 
 		if (!variant) {
 			throw new Error('Variant not found');
@@ -322,16 +489,16 @@ const rootResolvers = {
 
 		Object.keys(args).forEach((key) => {
 			if (key !== 'id' && args[key] !== undefined) {
-				variant[key] = args[key];
+				(variant as Record<string, unknown>)[key] = args[key];
 			}
 		});
 		variant.updatedAt = now();
 		saveDb(db);
 		return hydrateVariant(db, variant);
 	},
-	updateFamily(_, args) {
+	updateFamily(_parent, args) {
 		const db = loadDb();
-		const family = db.families[args.id];
+		const family = db.families[args.id as string];
 
 		if (!family) {
 			throw new Error('Family not found');
@@ -339,16 +506,16 @@ const rootResolvers = {
 
 		Object.keys(args).forEach((key) => {
 			if (key !== 'id' && args[key] !== undefined) {
-				family[key] = args[key];
+				(family as Record<string, unknown>)[key] = args[key];
 			}
 		});
 		family.updatedAt = now();
 		saveDb(db);
 		return hydrateFamily(db, family);
 	},
-	deleteVariant(_, args) {
+	deleteVariant(_parent, args) {
 		const db = loadDb();
-		const variant = db.variants[args.id];
+		const variant = db.variants[args.id as string];
 
 		if (!variant) {
 			return {id: args.id};
@@ -359,26 +526,26 @@ const rootResolvers = {
 		if (family) {
 			family.variantIds = family.variantIds.filter(id => id !== args.id);
 		}
-		delete db.variants[args.id];
+		delete db.variants[args.id as string];
 		saveDb(db);
 		return {id: args.id};
 	},
-	deleteFamily(_, args) {
+	deleteFamily(_parent, args) {
 		const db = loadDb();
-		const family = db.families[args.id];
+		const family = db.families[args.id as string];
 
 		if (family) {
 			(family.variantIds || []).forEach((id) => {
 				delete db.variants[id];
 			});
-			delete db.families[args.id];
+			delete db.families[args.id as string];
 			db.user.libraryIds = db.user.libraryIds.filter(id => id !== args.id);
 			saveDb(db);
 		}
 
 		return {id: args.id};
 	},
-	updateUser(_, args) {
+	updateUser(_parent, args) {
 		const db = loadDb();
 
 		Object.keys(args).forEach((key) => {
@@ -386,28 +553,28 @@ const rootResolvers = {
 				return;
 			}
 			if (key === 'appValues' || key === 'values') {
-				db.user.appValues = args[key];
+				db.user.appValues = args[key] as Record<string, unknown>;
 				return;
 			}
-			db.user[key] = args[key];
+			(db.user as Record<string, unknown>)[key] = args[key];
 		});
 		saveDb(db);
 		return hydrateUser(db);
 	},
-	createAbstractedFont(_, args) {
+	createAbstractedFont(_parent, args) {
 		const db = loadDb();
-		const abstracted = {
+		const abstracted: AbstractedFont = {
 			id: uid('abs'),
-			type: args.type,
-			name: args.name,
-			template: args.template || null,
-			variantId: args.variantId || null,
-			presetId: args.presetId || null,
+			type: args.type as string | undefined,
+			name: args.name as string | undefined,
+			template: (args.template as string | null | undefined) || null,
+			variantId: (args.variantId as string | null | undefined) || null,
+			presetId: (args.presetId as string | null | undefined) || null,
 			updatedAt: now(),
 		};
 
 		db.abstractedFonts[abstracted.id] = abstracted;
-		(args.usersIds || []).forEach(() => {
+		((args.usersIds as string[] | undefined) || []).forEach(() => {
 			if (!db.user.favouriteIds.includes(abstracted.id)) {
 				db.user.favouriteIds.push(abstracted.id);
 			}
@@ -415,9 +582,9 @@ const rootResolvers = {
 		saveDb(db);
 		return hydrateAbstracted(db, abstracted);
 	},
-	addToUserOnAbstractedFont(_, args) {
+	addToUserOnAbstractedFont(_parent, args) {
 		const db = loadDb();
-		const abstracted = db.abstractedFonts[args.favouritesAbstractedFontId];
+		const abstracted = db.abstractedFonts[args.favouritesAbstractedFontId as string];
 
 		if (abstracted && !db.user.favouriteIds.includes(abstracted.id)) {
 			db.user.favouriteIds.push(abstracted.id);
@@ -428,9 +595,9 @@ const rootResolvers = {
 			favouritesAbstractedFont: hydrateAbstracted(db, abstracted),
 		};
 	},
-	removeFromUserOnAbstractedFont(_, args) {
+	removeFromUserOnAbstractedFont(_parent, args) {
 		const db = loadDb();
-		const abstractedId = args.favouritesAbstractedFontId;
+		const abstractedId = args.favouritesAbstractedFontId as string;
 
 		db.user.favouriteIds = db.user.favouriteIds.filter(
 			id => id !== abstractedId,
@@ -450,15 +617,21 @@ const rootResolvers = {
 	},
 };
 
-export function executeLocalQuery(queryDoc, variables = {}) {
-	const query = typeof queryDoc === 'string' ? gql(queryDoc) : queryDoc;
+export function executeLocalQuery(
+	queryDoc: string | GraphQLDocument,
+	variables: Record<string, unknown> = {},
+): Record<string, unknown> {
+	const query
+		= typeof queryDoc === 'string'
+			? (gql(queryDoc) as unknown as GraphQLDocument)
+			: queryDoc;
 	const operation = getOperation(query);
 
 	if (!operation) {
 		return {};
 	}
 
-	const data = {};
+	const data: Record<string, unknown> = {};
 
 	operation.selectionSet.selections.forEach((field) => {
 		if (field.kind !== 'Field') {
@@ -481,7 +654,7 @@ export function executeLocalQuery(queryDoc, variables = {}) {
 	return data;
 }
 
-export function ensureLocalSession() {
+export function ensureLocalSession(): void {
 	if (!window.localStorage.getItem('graphcoolToken')) {
 		window.localStorage.setItem('graphcoolToken', LOCAL_TOKEN);
 	}

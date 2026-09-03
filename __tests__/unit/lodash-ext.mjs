@@ -1,5 +1,10 @@
-function needsJsExtension(specifier) {
-	if (specifier.endsWith('.js') || specifier.endsWith('.json') || specifier.endsWith('.mjs')) {
+function needsExtension(specifier) {
+	if (
+		specifier.endsWith('.js')
+		|| specifier.endsWith('.ts')
+		|| specifier.endsWith('.json')
+		|| specifier.endsWith('.mjs')
+	) {
 		return false;
 	}
 
@@ -11,12 +16,17 @@ function needsJsExtension(specifier) {
 }
 
 export async function resolve(specifier, context, nextResolve) {
-	if (needsJsExtension(specifier)) {
+	if (needsExtension(specifier)) {
 		try {
 			return await nextResolve(`${specifier}.js`, context);
 		}
 		catch {
-			return nextResolve(specifier, context);
+			try {
+				return await nextResolve(`${specifier}.ts`, context);
+			}
+			catch {
+				return nextResolve(specifier, context);
+			}
 		}
 	}
 

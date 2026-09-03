@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import Formula from '../../app/scripts/prototypo.js/precursor/Formula.js';
+import Formula from '../../app/scripts/prototypo.js/precursor/Formula.ts';
 
 function makeFormula() {
 	return new Formula(
