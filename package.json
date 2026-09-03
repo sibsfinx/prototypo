@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.23.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "antique.ptf": "byte-foundry/antique.ptf#feat/simplified-parameters",
     "babel-plugin-lodash": "lodash/babel-plugin-lodash#master",
     "bluebird": "^3.7.2",
@@ -56,7 +57,8 @@
     "tutorial-content": "byte-foundry/tutorial-content#master",
     "venus.ptf": "https://github.com/byte-foundry/venus.ptf#feat/simplified-params",
     "whatwg-fetch": "^0.9.0",
-    "xxhashjs": "^0.1.1"
+    "xxhashjs": "^0.1.1",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@babel/core": "^7.23.5",
@@ -113,6 +115,7 @@
     "preview": "vite preview",
     "build:storybook": "build-storybook",
     "start": "node scripts/copy-templates.mjs && vite",
+    "mcp": "node mcp/server.mjs",
     "storybook": "start-storybook -p 6006",
     "test": "NODE_PATH=$pwd/node_modules:$(pwd)/app jest",
     "test:unit": "node --import ./__tests__/unit/register-loader.mjs --test __tests__/unit/*.test.mjs",
