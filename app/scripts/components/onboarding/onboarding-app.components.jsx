@@ -154,7 +154,9 @@ class OnboardingApp extends React.PureComponent {
 				}
 			}
 			this.setState({creatingFamily: true});
-			const {data: {createFamily: newFont}} = await this.props.createFamily(
+			const {
+				data: {createFamily: newFont},
+			} = await this.props.createFamily(
 				name,
 				this.state.selectedTemplate,
 				this.state.selectedValues,
@@ -180,6 +182,10 @@ class OnboardingApp extends React.PureComponent {
 	}
 
 	getAlternateFonts() {
+		if (!this.state.glyphs) {
+			return;
+		}
+
 		const alternatesUnicodes = Object.keys(this.state.glyphs).filter(
 			key =>
 				this.state.glyphs[key].length > 1
@@ -201,7 +207,7 @@ class OnboardingApp extends React.PureComponent {
 	renderAlternates(stepData) {
 		const {alternatesDedup, values} = this.state;
 
-		if (Object.entries(alternatesDedup).length === 0) {
+		if (!alternatesDedup || Object.entries(alternatesDedup).length === 0) {
 			this.setState({step: this.state.step + 1});
 			return;
 		}
@@ -518,7 +524,7 @@ class OnboardingApp extends React.PureComponent {
 												index <= this.state.step
 													? this.setState({
 														step: index,
-													})
+													  })
 													: false;
 											}}
 										/>
@@ -753,7 +759,7 @@ export default compose(
 	}),
 	graphql(getUserIdQuery, {
 		props: ({data}) => {
-			if (data.loading) {
+			if (data.loading || !data.user) {
 				return {loading: true};
 			}
 
@@ -777,12 +783,13 @@ export default compose(
 			update: (store, {data: {createFamily}}) => {
 				const data = store.readQuery({query: libraryQuery});
 
-				data.user.library.push(createFamily);
-
-				store.writeQuery({
-					query: libraryQuery,
-					data,
-				});
+				if (data && data.user && Array.isArray(data.user.library)) {
+					data.user.library.push(createFamily);
+					store.writeQuery({
+						query: libraryQuery,
+						data,
+					});
+				}
 			},
 		},
 	}),

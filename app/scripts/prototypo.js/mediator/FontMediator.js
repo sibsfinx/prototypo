@@ -88,31 +88,36 @@ async function mergeFont(url, action, params, arrayBuffer, mime = 'otf') {
 
 export default class FontMediator {
 	hydrateTypedatas(typedatas) {
-		this.initValues = {};
-		this.glyphList = {};
-		this.fontMakers = {};
-		this.componentIdAndGlyphPerClass = {};
+		const initValues = {};
+		const glyphList = {};
+		const fontMakers = {};
+		const componentIdAndGlyphPerClass = {};
 
 		(typedatas || []).forEach((typedata) => {
 			if (!this.noCanvas && !process.env.LIBRARY) {
-				this.fontMakers[typedata.name] = new FontPrecursor(typedata.json);
+				fontMakers[typedata.name] = new FontPrecursor(typedata.json);
 			}
 
-			this.glyphList[typedata.name] = typedata.json.glyphs;
-			this.componentIdAndGlyphPerClass[
+			glyphList[typedata.name] = typedata.json.glyphs;
+			componentIdAndGlyphPerClass[
 				typedata.name
 			] = getComponentIdAndGlyphPerClass(typedata);
 
-			const initValues = {};
+			const values = {};
 
 			typedata.json.controls.forEach((group) => {
 				group.parameters.forEach((param) => {
-					initValues[param.name] = param.init;
+					values[param.name] = param.init;
 				});
 			});
 
-			this.initValues[typedata.name] = initValues;
+			initValues[typedata.name] = values;
 		});
+
+		this.initValues = initValues;
+		this.glyphList = glyphList;
+		this.fontMakers = fontMakers;
+		this.componentIdAndGlyphPerClass = componentIdAndGlyphPerClass;
 
 		return this.componentIdAndGlyphPerClass;
 	}
@@ -491,17 +496,22 @@ export default class FontMediator {
 		}
 
 		if (glyphCanvasUnicode && !this.noCanvas) {
-			const glyphForCanvas = this.fontMakers[template].constructFont(
-				{
-					...params,
-				},
-				[glyphCanvasUnicode],
-			);
+			try {
+				const glyphForCanvas = this.fontMakers[template].constructFont(
+					{
+						...params,
+					},
+					[glyphCanvasUnicode],
+				);
 
-			[window.glyph] = glyphForCanvas.glyphs;
-			localClient.dispatchAction('/store-value-font', {
-				glyph: Math.random(),
-			});
+				[window.glyph] = glyphForCanvas.glyphs;
+				localClient.dispatchAction('/store-value-font', {
+					glyph: Math.random(),
+				});
+			}
+			catch (error) {
+				console.error('FontMediator canvas constructFont failed', error);
+			}
 		}
 
 		return this.getFontObject(fontName, 'Regular', template, params, subset)

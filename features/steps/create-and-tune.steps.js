@@ -79,12 +79,22 @@ async function createFromGrotesk(page, familyName) {
 	await page.getByRole('button', {name: 'Start designing'}).click();
 
 	const stepButton = page.locator('button.nextStep');
+	const familyError = page.locator('.description.error');
 	await expect(page.locator('.onboarding-app')).toBeVisible();
-	await expect(stepButton).toBeVisible({timeout: 60_000});
+	await expect(stepButton.or(familyError)).toBeVisible({timeout: 60_000});
+	if (await familyError.isVisible().catch(() => false)) {
+		throw new Error(
+			`Onboarding failed: ${(await familyError.textContent()) || ''}`,
+		);
+	}
 
 	for (let i = 0; i < 12; i += 1) {
 		if (page.url().includes('dashboard')) {
 			break;
+		}
+		if (!(await stepButton.isVisible().catch(() => false))) {
+			await page.waitForTimeout(500);
+			continue;
 		}
 		const label = ((await stepButton.textContent()) || '').trim();
 		await stepButton.click();
