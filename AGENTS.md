@@ -19,3 +19,4 @@ Single-context. See `docs/agents/domain.md` and `CONTEXT.md`.
 - **OpenSpec**: `/opsx-propose`, `/opsx-apply`, `/opsx-archive`. CLI: `openspec` or `npx --yes @fission-ai/openspec@latest`.
 - **Matt Pocock**: `/grill-with-docs`, `/to-spec`, `/to-tickets`, `/implement`, plus model skills `tdd` and `code-review`. Installed under `.agents/skills/` (linked from `.cursor/skills/`).
 - **Archestra-apply**: `/archestra-apply` — plan → build → test → demo-record → verify-per-frames-and-spec. Skill: `.cursor/skills/archestra-apply/SKILL.md`.
+- **MCP Hub skills** (from [sibsfinx/mcp-hub](https://github.com/sibsfinx/mcp-hub); `sibsfinx/sklills` does not exist): Tavily, Krisp, Google Workspace, Bugsnag under `.agents/skills/` (linked from `.cursor/skills/`).

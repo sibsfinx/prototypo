@@ -1,0 +1,2 @@
+source: https://github.com/sibsfinx/mcp-hub (skills/)
+note: sibsfinx/sklills and sibsfinx/skills do not exist on GitHub
