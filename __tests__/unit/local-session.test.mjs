@@ -21,7 +21,7 @@ const {
 	LOCAL_TOKEN,
 	ensureLocalSession,
 	executeLocalQuery,
-} = await import('../../app/scripts/services/local-api.js');
+} = await import('../../app/scripts/services/local-api.ts');
 
 beforeEach(() => {
 	memory.clear();

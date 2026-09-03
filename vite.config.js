@@ -60,7 +60,7 @@ const env = {
 export default defineConfig({
 	plugins: [
 		react({
-			include: '**/*.{jsx,js}',
+			include: '**/*.{jsx,js,tsx,ts}',
 			jsxRuntime: 'classic',
 			babel: babelOptions,
 		}),
@@ -76,7 +76,7 @@ export default defineConfig({
 		},
 	},
 	resolve: {
-		extensions: ['.js', '.jsx', '.json'],
+		extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
 		alias: {
 			'please-wait': path.resolve(
 				__dirname,
@@ -130,7 +130,7 @@ export default defineConfig({
 		format: 'es',
 		plugins: () => [
 			react({
-				include: '**/*.{jsx,js}',
+				include: '**/*.{jsx,js,tsx,ts}',
 				jsxRuntime: 'classic',
 				babel: {
 					presets: [

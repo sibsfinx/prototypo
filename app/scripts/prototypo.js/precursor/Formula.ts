@@ -5,40 +5,79 @@ import _reduce from 'lodash/reduce';
 import _find from 'lodash/find';
 import _keys from 'lodash/keys';
 
+interface FormulaDefinition {
+	_parameters?: string[];
+	_operation: string | (() => unknown);
+	_dependencies: string[];
+}
+
+interface ExpandOperation {
+	action: 'expand';
+	cursor: string;
+}
+
+type OperationOrderEntry = string | ExpandOperation;
+
+interface GlyphLike {
+	name: {value: string};
+	getFromXPath(xpath: string): Formula & {
+		expandedTo?: unknown;
+		solveOperationOrder(
+			glyph: GlyphLike,
+			operationOrder: OperationOrderEntry[],
+		): OperationOrderEntry[];
+	};
+}
+
+type FormulaOperation = (
+	contours: Record<string, unknown>,
+	anchors: unknown,
+	parentAnchors: unknown,
+	utils: unknown,
+	...paramValues: number[]
+) => unknown;
+
 export default class Formula {
-	constructor(formula, cursor) {
+	cursor: string;
+
+	dependencies: string[];
+
+	operation: FormulaOperation;
+
+	parameters: string[];
+
+	analyzing: boolean;
+
+	constructor(formula: FormulaDefinition, cursor: string) {
 		this.cursor = cursor;
-		this.dependencies = formula._dependencies; // eslint-disable-line no-underscore-dangle
+		this.dependencies = formula._dependencies;
 		/* eslint-disable no-new-func */
+		const operationSource =
+			(typeof formula._operation === 'string'
+			&& formula._operation.indexOf('return ') === -1
+				? 'return '
+				: '')
+				// The operation might be wrapped in a function (e.g. multi-
+				// line code for debugging purpose). In this case, return
+				// must be explicit
+				+ formula._operation
+					.toString()
+					// [\s\S] need to be used instead of . because
+					// javascript doesn't have a dotall flag (s)
+					.replace(/^function\s*\(\)\s*\{([\s\S]*?)\}$/, '$1')
+					.trim();
+
 		this.operation = new Function(
 			...['contours', 'anchors', 'parentAnchors', 'Utils']
-				.concat(formula._parameters || []) // eslint-disable-line no-underscore-dangle
-				.concat(
-					(typeof formula._operation === 'string' // eslint-disable-line no-underscore-dangle
-					&& formula._operation.indexOf('return ') === -1 // eslint-disable-line no-underscore-dangle
-						? 'return '
-						: '')
-						// The operation might be wrapped in a function (e.g. multi-
-						// line code for debugging purpose). In this case, return
-						// must be explicit
-						+ formula._operation
-							.toString() // eslint-disable-line no-underscore-dangle
-							// [\s\S] need to be used instead of . because
-							// javascript doesn't have a dotall flag (s)
-							.replace(/^function\s*\(\)\s*\{([\s\S]*?)\}$/, '$1')
-							.trim(),
-					/* +
-				// add sourceURL pragma to help debugging
-				// TODO: restore sourceURL pragma if it proves necessary
-				'\n\n//# sourceURL=' + path */
-				),
-		);
+				.concat(formula._parameters || [])
+				.concat(operationSource),
+		) as FormulaOperation;
 		/* eslint-enable no-new-func */
-		this.parameters = formula._parameters; // eslint-disable-line no-underscore-dangle
+		this.parameters = formula._parameters || [];
 		this.analyzing = false;
 	}
 
-	analyzeDependency(glyph, graph = []) {
+	analyzeDependency(glyph: GlyphLike, graph: string[] = []): void {
 		graph.push(this.cursor);
 		if (this.analyzing) {
 			throw new Error(`There is a circular dependency for glyph ${
@@ -58,15 +97,23 @@ ${graph.join(' => ')}
 				}
 			}
 			catch (e) {
+				const message = e instanceof Error ? e.message : String(e);
+
 				throw new Error(`There was an error while checking glyph ${glyph.name.value} dependencies for cursor: ${dependency}.
-					${e.message}`);
+					${message}`);
 			}
 			graph.pop();
 		});
 		this.analyzing = false;
 	}
 
-	getResult(parameters, contours, anchors, parentAnchors, utils) {
+	getResult(
+		parameters: Record<string, unknown>,
+		contours: Record<string, unknown>,
+		anchors: unknown,
+		parentAnchors: unknown,
+		utils: unknown,
+	): unknown {
 		/* #if dev */
 		const missingParam = _difference(this.parameters, _keys(parameters));
 
@@ -74,7 +121,7 @@ ${graph.join(' => ')}
 			console.error(`parameters are missing: ${missingParam}`); // eslint-disable-line no-console
 		}
 		/* #end */
-		const args = [contours, anchors, parentAnchors, utils];
+		const args: unknown[] = [contours, anchors, parentAnchors, utils];
 
 		for (let i = 0; i < this.parameters.length; i++) {
 			const name = this.parameters[i];
@@ -83,7 +130,10 @@ ${graph.join(' => ')}
 			args.push(typeof value === 'number' && !Number.isNaN(value) ? value : 0);
 		}
 
-		const result = this.operation.apply(this, args);
+		const result = this.operation.apply(
+			this,
+			args as Parameters<FormulaOperation>,
+		);
 
 		if (typeof result === 'number' && isNaN(result)) {
 			/* eslint-disable no-console */
@@ -100,18 +150,21 @@ ${this.dependencies.map(name => `${name}: ${_get(contours, name)}`)}`);
 		return result;
 	}
 
-	solveOperationOrder(glyph, operationOrder) {
-		const result = [];
+	solveOperationOrder(
+		glyph: GlyphLike,
+		operationOrder: OperationOrderEntry[],
+	): OperationOrderEntry[] {
+		const result: OperationOrderEntry[] = [];
 		const operationsToSolve = _difference(
 			_uniq(this.dependencies),
-			operationOrder,
-		);
+			operationOrder as string[],
+		) as string[];
 
 		if (operationsToSolve.length > 0) {
 			result.push(
 				..._reduce(
 					operationsToSolve,
-					(acc, xpath) => {
+					(acc: OperationOrderEntry[], xpath: string) => {
 						const expandedIndex = xpath.indexOf('expandedTo');
 						const processedOps = [...operationOrder, ...result, ...acc];
 
@@ -198,7 +251,7 @@ ${this.dependencies.map(name => `${name}: ${_get(contours, name)}`)}`);
 										]),
 								);
 
-								const opToAdd = {
+								const opToAdd: ExpandOperation = {
 									action: 'expand',
 									cursor: base,
 								};
