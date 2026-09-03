@@ -125,8 +125,9 @@ async function setSlider(page, label, value) {
 	await expect(row).toBeVisible({timeout: 30_000});
 	const input = row.locator('input.slider-text-controller');
 	await input.click();
-	await input.fill(value);
-	await input.blur();
+	await input.fill('');
+	await input.pressSequentially(String(value), {delay: 40});
+	await input.press('Tab');
 	page._lastSlider = {label, value};
 }
 

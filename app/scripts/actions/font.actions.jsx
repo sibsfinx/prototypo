@@ -176,10 +176,14 @@ export default {
 
 		localServer.dispatchUpdate('/prototypoStore', patchVariant);
 
-		localClient.dispatchAction('/load-values', {
-			...initValues,
-			...savedValues,
-		});
+		const currentValues = undoableStore.get('controlsValues') || {};
+
+		if (!Object.keys(currentValues).length) {
+			localClient.dispatchAction('/load-values', {
+				...initValues,
+				...savedValues,
+			});
+		}
 
 		localClient.dispatchAction('/clear-undo-stack');
 		localClient.dispatchAction('/toggle-individualize', {
