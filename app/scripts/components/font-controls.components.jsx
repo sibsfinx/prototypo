@@ -3,6 +3,7 @@ import Lifespan from 'lifespan';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import LocalClient from '../stores/local-client.stores.jsx';
+import {prototypoStore} from '../stores/creation.stores.jsx';
 
 import {ControlsTabs, ControlsTab} from './controls-tabs.components.jsx';
 import {Sliders} from './sliders.components.jsx';
@@ -20,26 +21,46 @@ export default class FontControls extends React.PureComponent {
 		};
 	}
 
-	componentWillMount() {
+	async componentWillMount() {
 		this.lifespan = new Lifespan();
 		this.client = LocalClient.instance();
+
+		const apply = (headJS) => {
+			const data = headJS.d || headJS;
+
+			this.setState({
+				tabControls: data.fontTab || 'Func',
+				credits: data.credits,
+				parameters: data.fontParameters || [],
+				typeface: data.variant,
+				indivMode: data.indivMode,
+				indivEdit: data.indivEditingParams,
+				currentGroup: data.indivCurrentGroup || voidCurrentGroup,
+				uiSliderTooltip: data.uiSliderTooltip,
+				advancedMode: data.advancedMode,
+			});
+		};
+
+		apply({
+			fontTab: prototypoStore.get('fontTab'),
+			credits: prototypoStore.get('credits'),
+			fontParameters: prototypoStore.get('fontParameters'),
+			variant: prototypoStore.get('variant'),
+			indivMode: prototypoStore.get('indivMode'),
+			indivEditingParams: prototypoStore.get('indivEditingParams'),
+			indivCurrentGroup: prototypoStore.get('indivCurrentGroup'),
+			uiSliderTooltip: prototypoStore.get('uiSliderTooltip'),
+			advancedMode: prototypoStore.get('advancedMode'),
+		});
+
+		const snapshot = await this.client.fetch('/prototypoStore');
+
+		apply(snapshot.head.toJS());
 
 		this.client
 			.getStore('/prototypoStore', this.lifespan)
 			.onUpdate((head) => {
-				const headJS = head.toJS().d;
-
-				this.setState({
-					tabControls: headJS.fontTab,
-					credits: headJS.credits,
-					parameters: headJS.fontParameters || [],
-					typeface: headJS.variant,
-					indivMode: headJS.indivMode,
-					indivEdit: headJS.indivEditingParams,
-					currentGroup: headJS.indivCurrentGroup || voidCurrentGroup,
-					uiSliderTooltip: head.toJS().d.uiSliderTooltip,
-					advancedMode: head.toJS().d.advancedMode,
-				});
+				apply(head.toJS());
 			})
 			.onDelete(() => {
 				this.setState(undefined);

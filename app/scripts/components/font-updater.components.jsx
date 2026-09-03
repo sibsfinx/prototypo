@@ -10,7 +10,44 @@ class FontUpdater extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.fontMediatorInstance = FontMediator.instance();
+		this.fontMediatorInstance = null;
+		this.retryTimer = null;
+		this.ensureMediator = this.ensureMediator.bind(this);
+	}
+
+	componentDidMount() {
+		this.ensureMediator();
+	}
+
+	componentWillUnmount() {
+		if (this.retryTimer) {
+			clearTimeout(this.retryTimer);
+			this.retryTimer = null;
+		}
+	}
+
+	ensureMediator() {
+		try {
+			this.fontMediatorInstance = FontMediator.instance();
+		}
+		catch (error) {
+			this.fontMediatorInstance = null;
+		}
+
+		const ready
+			= this.fontMediatorInstance
+			&& typeof this.fontMediatorInstance.templateIsReady === 'function'
+			&& this.fontMediatorInstance.templateIsReady(this.props.template);
+
+		if (!ready && !this.retryTimer) {
+			this.retryTimer = setTimeout(() => {
+				this.retryTimer = null;
+				this.ensureMediator();
+				this.forceUpdate();
+			}, 250);
+		}
+
+		return ready ? this.fontMediatorInstance : null;
 	}
 
 	shouldComponentUpdate(nextProps) {
@@ -30,25 +67,29 @@ class FontUpdater extends React.Component {
 
 	render() {
 		const {template, name, subset, glyph, values, family, variant} = this.props;
+		const mediator = this.ensureMediator();
+
+		if (!mediator) {
+			return false;
+		}
 
 		const subsetCodes = _uniq(subset.split('')).map(letter =>
 			letter.charCodeAt(0),
 		);
 
-		this.fontMediatorInstance.setupInfo({
-			family,
-			style: variant,
-			template,
-			email: HoodieApi.instance.email,
-		});
+		try {
+			mediator.setupInfo({
+				family,
+				style: variant,
+				template,
+				email: HoodieApi.instance && HoodieApi.instance.email,
+			});
 
-		this.fontMediatorInstance.getFont(
-			name,
-			template,
-			values,
-			subsetCodes,
-			glyph,
-		);
+			mediator.getFont(name, template, values, subsetCodes, glyph);
+		}
+		catch (error) {
+			console.error('FontUpdater skipped getFont', error);
+		}
 
 		return false;
 	}

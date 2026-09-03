@@ -18,7 +18,7 @@ Before installing Prototypo
 
 In order to build Prototypo, you need to install the following software-packages on your system:
 - Git
-- node >= 4 with npm >= 3 or yarn
+- Node ≥ 24 with [pnpm](https://pnpm.io) ≥ 11
 
 Installing Prototypo
 --------------------
@@ -32,14 +32,30 @@ $ git clone git://github.com/byte-foundry/prototypo.git && cd prototypo
 Install build scripts and frontend libraries
 
 ```bash
-$ yarn
+$ pnpm install
 ```
 
-Running Prototypo
------------------
+Running Prototypo with Docker
+-----------------------------
+
+You can also run Prototypo using Docker:
 
 ```bash
-$ yarn start
+$ docker-compose up
+```
+
+Or build and run the Docker image manually:
+
+```bash
+$ docker build -t prototypo .
+$ docker run -p 8080:8080 prototypo
+```
+
+Running Prototypo (without Docker)
+----------------------------------
+
+```bash
+$ pnpm start
 ```
 
 Roadmap to v1.0

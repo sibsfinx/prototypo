@@ -100,7 +100,7 @@ export default class PrototypoCanvas extends React.PureComponent {
 	componentDidMount() {
 		// This enable the glyph canvas component to be hot reloaded
 		// By changing the key of the component, it is recreated
-		if (module.hot) {
+		if (typeof module !== 'undefined' && module.hot) {
 			module.hot.accept('./glyph-canvas.components', () => {
 				this.setState({__devReloadKey: Date.now(), error: false});
 			});

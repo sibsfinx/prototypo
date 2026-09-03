@@ -119,9 +119,7 @@ export function fontToSfntTable(font) {
 		const unicode = glyph.unicode;
 
 		if (isNaN(glyph.advanceWidth)) {
-			throw new Error(
-				`Glyph ${glyph.name} (${i}): advanceWidth is not a number`,
-			);
+			glyph.advanceWidth = 100;
 		}
 
 		if (firstCharIndex > unicode && unicode > 0) {

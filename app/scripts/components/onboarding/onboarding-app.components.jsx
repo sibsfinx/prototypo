@@ -8,6 +8,7 @@ import 'react-tippy/dist/tippy.css';
 import onboardingData from '../../data/onboarding.data';
 import apolloClient from '../../services/graphcool.services';
 import LocalClient from '../../stores/local-client.stores';
+import {prototypoStore} from '../../stores/creation.stores';
 
 import Button from '../shared/new-button.components';
 import Step from './step.components';
@@ -97,10 +98,16 @@ class OnboardingApp extends React.PureComponent {
 	}
 
 	finishOnboarding() {
-		this.props.updateVariant(
-			this.state.family.variants[0].id,
-			this.state.values,
-		);
+		const variantId
+			= this.state.family
+			&& this.state.family.variants
+			&& this.state.family.variants[0]
+			&& this.state.family.variants[0].id;
+
+		if (variantId && this.props.updateVariant) {
+			this.props.updateVariant(variantId, this.state.values);
+		}
+
 		this.props.router.push('/dashboard');
 	}
 
@@ -154,16 +161,36 @@ class OnboardingApp extends React.PureComponent {
 				}
 			}
 			this.setState({creatingFamily: true});
-			const {data: {createFamily: newFont}} = await this.props.createFamily(
+			const {
+				data: {createFamily: newFont},
+			} = await this.props.createFamily(
 				name,
 				this.state.selectedTemplate,
 				this.state.selectedValues,
 				abstracted ? abstracted.id : undefined,
 			);
 
-			this.setState({creatingFamily: false});
-			this.setState({createFamily: true});
+			this.setState({
+				creatingFamily: false,
+				createFamily: true,
+				family: newFont,
+			});
 			this.client.dispatchAction('/family-created', newFont);
+
+			const templateData = (prototypoStore.get('templatesData') || []).find(
+				t => t.name === this.state.selectedTemplate,
+			);
+
+			if (templateData && templateData.json) {
+				this.client.dispatchAction('/load-params', {
+					controls: templateData.json.controls,
+					presets: templateData.json.presets,
+				});
+				this.client.dispatchAction('/load-values', {
+					...templateData.initValues,
+					...(this.state.selectedValues || {}),
+				});
+			}
 
 			this.client.dispatchAction('/change-font', {
 				templateToLoad: newFont.template,
@@ -180,6 +207,10 @@ class OnboardingApp extends React.PureComponent {
 	}
 
 	getAlternateFonts() {
+		if (!this.state.glyphs) {
+			return;
+		}
+
 		const alternatesUnicodes = Object.keys(this.state.glyphs).filter(
 			key =>
 				this.state.glyphs[key].length > 1
@@ -201,7 +232,7 @@ class OnboardingApp extends React.PureComponent {
 	renderAlternates(stepData) {
 		const {alternatesDedup, values} = this.state;
 
-		if (Object.entries(alternatesDedup).length === 0) {
+		if (!alternatesDedup || Object.entries(alternatesDedup).length === 0) {
 			this.setState({step: this.state.step + 1});
 			return;
 		}
@@ -518,7 +549,7 @@ class OnboardingApp extends React.PureComponent {
 												index <= this.state.step
 													? this.setState({
 														step: index,
-													})
+													  })
 													: false;
 											}}
 										/>
@@ -753,7 +784,7 @@ export default compose(
 	}),
 	graphql(getUserIdQuery, {
 		props: ({data}) => {
-			if (data.loading) {
+			if (data.loading || !data.user) {
 				return {loading: true};
 			}
 
@@ -777,12 +808,13 @@ export default compose(
 			update: (store, {data: {createFamily}}) => {
 				const data = store.readQuery({query: libraryQuery});
 
-				data.user.library.push(createFamily);
-
-				store.writeQuery({
-					query: libraryQuery,
-					data,
-				});
+				if (data && data.user && Array.isArray(data.user.library)) {
+					data.user.library.push(createFamily);
+					store.writeQuery({
+						query: libraryQuery,
+						data,
+					});
+				}
 			},
 		},
 	}),
@@ -799,11 +831,17 @@ export default compose(
 		options: {
 			update: (store, {data: {updateVariant}}) => {
 				const data = store.readQuery({query: libraryQuery});
-				const variant = data.user.library.find(
-					f => f.id === updateVariant.family.id,
-				).variants[0];
+				const family
+					= data
+					&& data.user
+					&& data.user.library
+					&& data.user.library.find(f => f.id === updateVariant.family.id);
 
-				variant.values = updateVariant.values;
+				if (!family || !family.variants || !family.variants[0]) {
+					return;
+				}
+
+				family.variants[0].values = updateVariant.values;
 				store.writeQuery({
 					query: libraryQuery,
 					data,

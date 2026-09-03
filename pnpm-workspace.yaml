@@ -1,0 +1,27 @@
+shamefullyHoist: true
+strictPeerDependencies: false
+autoInstallPeers: true
+strictDepBuilds: true
+blockExoticSubdeps: false
+
+allowBuilds:
+  '@parcel/watcher': true
+  core-js: true
+  esbuild: true
+  husky: true
+  es5-ext: false
+  puppeteer: false
+  uglifyjs-webpack-plugin: false
+  uws: false
+  'antique.ptf@git+https://github.com/byte-foundry/antique.ptf.git': true
+  'babel-plugin-lodash@git+https://github.com/lodash/babel-plugin-lodash.git': true
+  'elzevir.ptf@git+https://github.com/byte-foundry/elzevir.ptf.git': true
+  'gfnt.ptf@git+https://github.com/byte-foundry/spectral.ptf.git': true
+  'john-fell.ptf@git+https://github.com/byte-foundry/john-fell.ptf.git': true
+  'lifespan@git+https://github.com/FranzPoize/lifespan.git': true
+  'nexus-events@git+https://github.com/franzpoize/nexus-events.git': true
+  'nexus-flux@git+https://github.com/FranzPoize/nexus-flux.git': true
+  'react-motion-flip@git+https://github.com/Aldrian/react-motion-flip.git': true
+  'remutable@git+https://github.com/FranzPoize/remutable.git': true
+  'tutorial-content@git+https://github.com/byte-foundry/tutorial-content.git': true
+  'venus.ptf@git+https://github.com/byte-foundry/venus.ptf.git': true

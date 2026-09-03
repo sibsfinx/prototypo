@@ -1,53 +1,36 @@
-import {ApolloClient, createBatchingNetworkInterface} from 'react-apollo';
+import {ApolloClient} from 'react-apollo';
 
-import isProduction from '../helpers/is-production.helpers';
+import {ensureLocalSession, executeLocalQuery} from './local-api';
 
-const networkInterface = createBatchingNetworkInterface({
-	uri: `https://api.graph.cool/simple/v1/prototypo${
-		isProduction() ? '' : '-new-dev'
-	}`,
-	batchInterval: 10,
-});
+ensureLocalSession();
 
-networkInterface.use([
-	{
-		applyBatchMiddleware(req, next) {
-			if (!req.options.headers) {
-				req.options.headers = {};
-			}
+const networkInterface = {
+	query(request) {
+		try {
+			const data = executeLocalQuery(request.query, request.variables || {});
 
-			// get the authentication token from local storage if it exists
-			if (localStorage.getItem('graphcoolToken')) {
-				req.options.headers.authorization = `Bearer ${localStorage.getItem(
-					'graphcoolToken',
-				)}`;
-			}
-			next();
-		},
+			return Promise.resolve({data});
+		}
+		catch (error) {
+			console.error('[local-api] GraphQL error', error);
+			return Promise.resolve({
+				data: null,
+				errors: [{message: error.message}],
+			});
+		}
 	},
-]);
+};
 
 const apolloClient = new ApolloClient({
 	networkInterface,
-	dataIdFromObject: o => o.id,
+	dataIdFromObject: object => object && object.id,
 	connectToDevTools: true,
 });
 
-export const tmpUpload = async (file, name = 'font') => {
-	const data = new FormData();
-
-	data.append('filename', name);
-	data.append('data', file);
-
-	const response = await fetch(
-		'https://api.graph.cool/file/v1/ciz3x8qbba0ni0192kaicafgo',
-		{
-			method: 'POST',
-			body: data,
-		},
-	);
-
-	return response.json();
-};
+export const tmpUpload = async (file, name = 'font') => ({
+	id: `local-file-${Date.now()}`,
+	url: typeof file === 'string' ? file : URL.createObjectURL(file),
+	name,
+});
 
 export default apolloClient;

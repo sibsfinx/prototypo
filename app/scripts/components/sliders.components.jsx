@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import Lifespan from 'lifespan';
 
 import LocalClient from '../stores/local-client.stores.jsx';
+import {undoableStore} from '../stores/creation.stores.jsx';
 import {indivGroupsEditionTutorialLabel} from '../helpers/joyride.helpers.js';
 import SliderHelpText from '../../images/sliders/helpText.json';
 
@@ -23,15 +24,29 @@ export class Sliders extends React.PureComponent {
 		this.client
 			.getStore('/undoableStore', this.lifespan)
 			.onUpdate((head) => {
-				const headJS = head.toJS().d;
+				const fromStore = undoableStore.get('controlsValues');
+
+				if (fromStore && Object.keys(fromStore).length) {
+					this.setState({values: fromStore});
+					return;
+				}
+
+				const js = head && typeof head.toJS === 'function' ? head.toJS() : {};
+				const data = js.d || js;
 
 				this.setState({
-					values: headJS.controlsValues,
+					values: data.controlsValues,
 				});
 			})
 			.onDelete(() => {
 				this.setState({values: undefined});
 			});
+
+		const currentValues = undoableStore.get('controlsValues');
+
+		if (currentValues && Object.keys(currentValues).length) {
+			this.setState({values: currentValues});
+		}
 
 		this.client
 			.getStore('/userStore', this.lifespan)
@@ -170,13 +185,25 @@ export class Slider extends React.PureComponent {
 
 		this.changeParam = this.changeParam.bind(this);
 		this.resetValue = this.resetValue.bind(this);
+		this.state = {draft: undefined};
 	}
 
 	componentWillMount() {
 		this.client = LocalClient.instance();
 	}
 
+	componentWillReceiveProps(nextProps) {
+		if (
+			this.state.draft !== undefined
+			&& nextProps.value !== undefined
+			&& nextProps.value === this.state.draft
+		) {
+			this.setState({draft: undefined});
+		}
+	}
+
 	resetValue() {
+		this.setState({draft: this.props.init});
 		this.client.dispatchAction('/change-param', {
 			value: this.props.init,
 			name: this.props.name,
@@ -210,6 +237,9 @@ export class Slider extends React.PureComponent {
 	}
 
 	changeParam(params) {
+		if (typeof params.value === 'number' && !Number.isNaN(params.value)) {
+			this.setState({draft: params.value});
+		}
 		this.client.dispatchAction('/change-param', params);
 	}
 
@@ -228,7 +258,12 @@ export class Slider extends React.PureComponent {
 			state,
 			advanced,
 		} = this.props;
-		const value = this.props.value === undefined ? init : this.props.value;
+		const value
+			= this.state.draft !== undefined
+				? this.state.draft
+				: this.props.value === undefined
+					? init
+					: this.props.value;
 
 		const classes = classNames({
 			slider: true,
@@ -484,6 +519,7 @@ export class SliderTextController extends React.PureComponent {
 			<input
 				className={classes}
 				type="number"
+				step="any"
 				value={this.state.isTyping ? value : value.toFixed(2)}
 				onChange={this.handleChange}
 				onClick={this.handleClick}

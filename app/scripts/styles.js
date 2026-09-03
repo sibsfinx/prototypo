@@ -1,6 +1,6 @@
 import '../styles/main.scss';
 import 'normalize.css/normalize.css';
-import 'please-wait/build/please-wait.css';
+import '../vendor/please-wait.css';
 import 'react-select/dist/react-select.css';
 import 'react-joyride/lib/react-joyride-compiled.css';
 import 'draft-js/dist/Draft.css';
@@ -48,7 +48,6 @@ import '../styles/components/zoom-buttons.scss';
 import '../styles/components/controls-tabs.scss';
 import '../styles/components/tutorials.scss';
 import '../styles/components/go-pro-modal.scss';
-import '../styles/components/oauth-buttons.scss';
 import '../styles/components/shared/pricing.scss';
 import '../styles/components/handlegrip-text.scss';
 import '../styles/components/account/account-app.scss';

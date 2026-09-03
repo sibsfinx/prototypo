@@ -674,8 +674,8 @@ export default compose(
 			}
 
 			return {
-				academyProgress: data.user.academyProgress,
-				manager: data.user.manager,
+				academyProgress: (data.user && data.user.academyProgress) || {},
+				manager: data.user && data.user.manager,
 			};
 		},
 	}),

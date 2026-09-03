@@ -7,8 +7,6 @@ import {
 	IndexRedirect,
 } from 'react-router';
 import {ApolloProvider} from 'react-apollo';
-import {hot} from 'react-hot-loader';
-
 import HoodieApi from './services/hoodie.services';
 
 import LibraryApp from './components/library/library-app.components';
@@ -57,9 +55,6 @@ import Subscription from './components/account/subscription.components';
 import FontTester from './font-test/font-tester.components.jsx';
 
 import GlyphTester from './font-test/glyph-tester.components.jsx';
-/* #if debug */
-import ReplayViewer from './debug/replay-viewer.components';
-/* #end */
 
 import apolloClient from './services/graphcool.services';
 
@@ -150,14 +145,6 @@ class AppRoutes extends React.PureComponent {
 							onEnter={redirectToLogin}
 						/>
 						<Route path="onboarding" component={OnboardingApp} />
-						/* #if debug */
-						<Route
-							path="replay"
-							path="replay/:replayId"
-							component={ReplayViewer}
-						/>
-						<Route path="debug" component={ReplayViewer} />
-						/* #endif */
 						<Route path="testfont" component={FontTester} />
 						<Route path="testglyph/:unicode" component={GlyphTester} />
 						<Route
@@ -350,4 +337,4 @@ class AppRoutes extends React.PureComponent {
 	}
 }
 
-export default hot(module)(AppRoutes);
+export default AppRoutes;

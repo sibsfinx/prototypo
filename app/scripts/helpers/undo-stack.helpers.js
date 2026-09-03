@@ -63,7 +63,9 @@ class BatchUpdate {
 		}
 
 		if (
-			patch.mutations[this.propName].f
+			patch.mutations
+			&& patch.mutations[this.propName]
+			&& patch.mutations[this.propName].f
 			&& this.criteria(
 				patch.mutations[this.propName].t[prop],
 				patch.mutations[this.propName].f[prop],

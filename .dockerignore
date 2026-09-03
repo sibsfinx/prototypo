@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.travis.yml
+README.md
+.env
+.DS_Store
+dist
+build
+coverage
+.storybook
+stories
+__tests__
+test
+.netlify

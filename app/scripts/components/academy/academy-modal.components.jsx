@@ -7,6 +7,7 @@ import {Link} from 'react-router';
 import {academyTutorialLabel} from '../../helpers/joyride.helpers.js';
 import Button from '../shared/button.components.jsx';
 import LocalClient from '../../stores/local-client.stores.jsx';
+import medalSvg from '../../../images/academy/medal.svg?raw';
 
 export default class AcademyModal extends React.Component {
 	constructor(props) {
@@ -54,12 +55,13 @@ export default class AcademyModal extends React.Component {
 					<InlineSVG
 						className="academy-modal-icon"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=modal-!../../../images/academy/medal.svg')}
+						src={medalSvg}
 					/>
 				</div>
 				<h2>Hey there!</h2>
 				<p>
-					Do you want to learn how to use Prototypo?<br />
+					Do you want to learn how to use Prototypo?
+					<br />
 					Don't worry, we've set up a series of courses just for you.
 				</p>
 				<br />

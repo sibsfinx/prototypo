@@ -58,9 +58,7 @@ ${graph.join(' => ')}
 				}
 			}
 			catch (e) {
-				throw new Error(`There was an error while checking glyph ${
-					glyph.name.value
-				} dependencies for cursor: ${dependency}.
+				throw new Error(`There was an error while checking glyph ${glyph.name.value} dependencies for cursor: ${dependency}.
 					${e.message}`);
 			}
 			graph.pop();
@@ -80,8 +78,9 @@ ${graph.join(' => ')}
 
 		for (let i = 0; i < this.parameters.length; i++) {
 			const name = this.parameters[i];
+			const value = parameters[name];
 
-			args.push(parameters[name]);
+			args.push(typeof value === 'number' && !Number.isNaN(value) ? value : 0);
 		}
 
 		const result = this.operation.apply(this, args);

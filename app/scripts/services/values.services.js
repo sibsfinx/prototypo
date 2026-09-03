@@ -72,7 +72,13 @@ function values(prefix) {
 							}
 						`,
 					})
-					.then(({data: {user}}) => {
+					.then(({data}) => {
+						const user = data && data.user;
+
+						if (!user) {
+							return;
+						}
+
 						apolloClient
 							.mutate({
 								mutation: gql`

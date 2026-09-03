@@ -15,6 +15,7 @@ import LocalClient from '../stores/local-client.stores';
 
 import {FontValues} from '../services/values.services';
 import apolloClient from '../services/graphcool.services';
+import {loadTemplateJson} from '../helpers/load-template.helpers';
 
 import {loadFontValues, saveAppValues} from '../helpers/loadValues.helpers';
 import {BatchUpdate} from '../helpers/undo-stack.helpers';
@@ -87,7 +88,7 @@ export default {
 				const template = appValues.values.familySelected
 					? appValues.values.familySelected.template
 					: 'venus.ptf';
-				const typedataJSON = await import(/* webpackChunkName: "ptfs" */ `../../../dist/templates/${template}/font.json`);
+				const typedataJSON = await loadTemplateJson(template);
 
 				localClient.dispatchAction('/create-font-instance', {
 					typedataJSON,
@@ -138,7 +139,7 @@ export default {
 		localClient.dispatchAction('/load-tags', typedata.fontinfo.tags);
 	},
 	'/change-font': async ({templateToLoad, variant, family}) => {
-		const typedataJSON = await import(/* webpackChunkName: "ptfs" */ `../../../dist/templates/${templateToLoad}/font.json`);
+		const typedataJSON = await loadTemplateJson(templateToLoad);
 
 		localClient.dispatchAction('/store-value-font', {
 			changingFont: true,
@@ -157,7 +158,16 @@ export default {
 			}),
 		);
 
-		const fontValues = await FontValues.get({variantId: variant.id});
+		let savedValues = {};
+
+		try {
+			const fontValues = await FontValues.get({variantId: variant.id});
+
+			savedValues = (fontValues && fontValues.values) || {};
+		}
+		catch (error) {
+			console.error('/change-font FontValues.get failed', error);
+		}
 
 		const patchVariant = prototypoStore
 			.set('variant', variant)
@@ -166,15 +176,14 @@ export default {
 
 		localServer.dispatchUpdate('/prototypoStore', patchVariant);
 
-		const altList = {
-			...typedataJSON.fontinfo.defaultAlts,
-			...fontValues.values.altList,
-		};
+		const currentValues = undoableStore.get('controlsValues') || {};
 
-		localClient.dispatchAction('/load-values', {
-			...initValues,
-			...fontValues.values,
-		});
+		if (!Object.keys(currentValues).length) {
+			localClient.dispatchAction('/load-values', {
+				...initValues,
+				...savedValues,
+			});
+		}
 
 		localClient.dispatchAction('/clear-undo-stack');
 		localClient.dispatchAction('/toggle-individualize', {
@@ -187,8 +196,8 @@ export default {
 	},
 	'/family-created': async ({name, variants, template}) => {
 		const patchVariant = prototypoStore
-			.set('variant', variants[0])
-			.set('family', {name, template})
+			.set('variant', variants && variants[0])
+			.set('family', {name, template, variants})
 			.set('uiCreatefamilySelectedTemplate', undefined)
 			.set('openFamilyModal', false)
 			.commit();
@@ -197,22 +206,31 @@ export default {
 
 		saveAppValues();
 
-		const {data: {user}} = await apolloClient.query({
-			query: gql`
-				query getVariantsCount {
-					user {
-						id
-						libraryMeta: _libraryMeta {
-							count
+		try {
+			const result = await apolloClient.query({
+				query: gql`
+					query getVariantsCount {
+						user {
+							id
+							libraryMeta: _libraryMeta {
+								count
+							}
 						}
 					}
-				}
-			`,
-		});
+				`,
+			});
+			const user = result && result.data && result.data.user;
+			const count = user && user.libraryMeta && user.libraryMeta.count;
 
-		window.Intercom('update', {
-			number_of_family: user.libraryMeta.count,
-		});
+			if (typeof window.Intercom === 'function') {
+				window.Intercom('update', {
+					number_of_family: count,
+				});
+			}
+		}
+		catch (error) {
+			console.error('/family-created follow-up failed', error);
+		}
 	},
 	'/select-variant': ({family, selectedVariant = family.variants[0]}) => {
 		localClient.dispatchAction('/change-font', {
@@ -243,7 +261,9 @@ export default {
 			values.slant = 10;
 		}
 
-		const {data: {variant}} = await apolloClient.mutate({
+		const {
+			data: {variant},
+		} = await apolloClient.mutate({
 			mutation: gql`
 				mutation createVariant($name: String!, $familyId: ID!, $values: Json) {
 					variant: createVariant(
@@ -279,7 +299,9 @@ export default {
 			errorAddVariant: undefined,
 		});
 
-		const {data: {user}} = await apolloClient.query({
+		const {
+			data: {user},
+		} = await apolloClient.query({
 			query: gql`
 				query getvariantscount {
 					user {
@@ -328,7 +350,9 @@ export default {
 			family.name === currentFamily.name
 			&& family.template === currentFamily.template
 		) {
-			const {data: {user}} = await apolloClient.query({
+			const {
+				data: {user},
+			} = await apolloClient.query({
 				fetchPolicy: 'cache-first',
 				query: gql`
 					query getUserLibrary {
@@ -399,7 +423,7 @@ export default {
 		const variantId = (prototypoStore.get('variant') || {}).id;
 		const currentGroupName = (prototypoStore.get('indivCurrentGroup') || {})
 			.name;
-		let newParams = {...undoableStore.get('controlsValues')};
+		let newParams = _cloneDeep(undoableStore.get('controlsValues') || {});
 
 		if (indivMode && indivEdit && !values) {
 			if (newParams.indiv_group_param[currentGroupName][name]) {
@@ -438,13 +462,19 @@ export default {
 
 		localServer.dispatchUpdate('/undoableStore', patch);
 
-		if (force) {
-			// TODO(franz): This SHOULD totally end up being in a flux store on hoodie
-			undoWatcher.forceUpdate(patch, label);
-			debouncedSave(newParams, variantId);
+		try {
+			if (force) {
+				if (undoWatcher) {
+					undoWatcher.forceUpdate(patch, label);
+				}
+				debouncedSave(newParams, variantId);
+			}
+			else if (undoWatcher) {
+				undoWatcher.update(patch, label);
+			}
 		}
-		else {
-			undoWatcher.update(patch, label);
+		catch (error) {
+			console.error('/change-param undoWatcher failed', error);
 		}
 	},
 	'/change-param-state': ({name, state, force, label}) => {

@@ -2,9 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 
 const node_modules = path.resolve(__dirname, 'node_modules');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
+	mode: 'production',
 	entry: {
 		libs: [
 			'react',
@@ -39,6 +40,16 @@ module.exports = {
 		library: '[name]_[hash]',
 		libraryTarget: 'this',
 	},
+	optimization: {
+		minimizer: [
+			new TerserPlugin({
+				parallel: true,
+				terserOptions: {
+					sourceMap: true,
+				},
+			}),
+		],
+	},
 	plugins: [
 		new webpack.DefinePlugin({
 			'process.env': {
@@ -49,11 +60,6 @@ module.exports = {
 		new webpack.DllPlugin({
 			path: path.join(__dirname, 'dist/dll/', '[name]-manifest.json'),
 			name: '[name]_[hash]',
-		}),
-		new UglifyJsPlugin({
-			sourceMap: true,
-			include: __dirname,
-			extractComments: true,
 		}),
 	],
 };

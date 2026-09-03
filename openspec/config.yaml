@@ -1,0 +1,21 @@
+schema: spec-driven
+
+context: |
+  Prototypo local-first font editor. React 16 + Apollo 1 + Flux stores, Vite 5, pnpm 11.
+  Glossary lives in CONTEXT.md. OpenSpec is the spec of record.
+  Apply loop is /archestra-apply: plan, build, test (pnpm test:unit and pnpm test:bdd), demo-record, verify frames against scenarios.
+  Do not restore Graphcool, Stripe, or OAuth. Do not commit public/templates/*.json.
+
+rules:
+  proposal:
+    - Name the user-visible capability, not the Vite workaround
+  specs:
+    - Use WHEN/THEN scenarios that a demo frame can prove
+  tasks:
+    - Include a unit-test task at each listed seam and a demo-verify task
+
+operations:
+  apply:
+    guidance:
+      - After code tasks, run pnpm test:unit and pnpm test:bdd before marking the test tasks done
+      - Do not archive until archestra-apply verify-report.md exists with every beat pass

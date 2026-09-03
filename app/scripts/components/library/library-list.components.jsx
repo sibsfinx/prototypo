@@ -43,26 +43,46 @@ class LibraryList extends React.Component {
 		this.lifespan = new Lifespan();
 
 		const prototypoStore = await this.client.fetch('/prototypoStore');
+		const store = prototypoStore.head.toJS();
 
-		this.setState({
-			templateInfos: prototypoStore.head.toJS().templateList,
-		});
+		this.setState(
+			{
+				templateInfos: store.templateList,
+				templatesData: store.templatesData,
+			},
+			() => {
+				this.generateFonts(
+					undefined,
+					undefined,
+					undefined,
+					store.templateList,
+					store.templatesData,
+				);
+			},
+		);
 
 		this.client
 			.getStore('/prototypoStore', this.lifespan)
 			.onUpdate((head) => {
+				const data = head.toJS().d;
+
 				this.setState({
-					openVariantModal: head.toJS().d.openVariantModal,
-					openChangeVariantNameModal: head.toJS().d.openChangeVariantNameModal,
-					openDuplicateVariantModal: head.toJS().d.openDuplicateVariantModal,
-					familySelectedVariantCreation: head.toJS().d
-						.familySelectedVariantCreation,
-					collectionSelectedVariant: head.toJS().d.collectionSelectedVariant,
-					templatesData: head.toJS().d.templatesData,
-					exporting: head.toJS().d.export,
-					errorExport: head.toJS().d.errorExport,
+					openVariantModal: data.openVariantModal,
+					openChangeVariantNameModal: data.openChangeVariantNameModal,
+					openDuplicateVariantModal: data.openDuplicateVariantModal,
+					familySelectedVariantCreation: data.familySelectedVariantCreation,
+					collectionSelectedVariant: data.collectionSelectedVariant,
+					templatesData: data.templatesData,
+					exporting: data.export,
+					errorExport: data.errorExport,
 				});
-				this.generateFonts();
+				this.generateFonts(
+					undefined,
+					undefined,
+					undefined,
+					data.templateList,
+					data.templatesData,
+				);
 			})
 			.onDelete(() => {
 				this.setState(undefined);
@@ -225,10 +245,12 @@ class LibraryList extends React.Component {
 			};
 	}
 
-	generateFonts(f, p, fa) {
-		const families = f || this.props.families;
-		const presets = p || this.props.presets;
+	generateFonts(f, p, fa, nextTemplateInfos, nextTemplatesData) {
+		const families = f || this.props.families || [];
+		const presets = p || this.props.presets || [];
 		const favourites = fa || this.props.favourites || [];
+		const templateInfos = nextTemplateInfos || this.state.templateInfos;
+		const templatesData = nextTemplatesData || this.state.templatesData || [];
 		const customBadgesColor = [
 			'#003049',
 			'#D62828',
@@ -251,11 +273,15 @@ class LibraryList extends React.Component {
 
 		const fontData = [];
 
-		this.state.templateInfos
-			&& this.state.templateInfos.forEach((template) => {
-				const templateData = this.state.templatesData.find(
+		templateInfos
+			&& templateInfos.forEach((template) => {
+				const templateData = templatesData.find(
 					e => e.name === template.templateName,
 				);
+
+				if (!templateData) {
+					return;
+				}
 
 				fontData.push({
 					template: template.templateName,
@@ -271,14 +297,14 @@ class LibraryList extends React.Component {
 			});
 		const havasPreset
 			= presets
-			&& this.state.templateInfos
+			&& templateInfos
 			&& presets.find(e => e.ownerInitials === 'HAVAS');
 
 		if (havasPreset) {
-			const templateInfo = this.state.templateInfos.find(
+			const templateInfo = templateInfos.find(
 				template => havasPreset.template === template.templateName,
 			) || {name: 'Undefined'};
-			const templateData = this.state.templatesData.find(
+			const templateData = templatesData.find(
 				e => e.name === havasPreset.template,
 			);
 
@@ -303,7 +329,7 @@ class LibraryList extends React.Component {
 		}
 		const filteredPresets
 			= presets
-			&& this.state.templateInfos
+			&& templateInfos
 			&& presets.filter(
 				preset =>
 					preset.variant.family.name !== 'Spectral'
@@ -317,10 +343,10 @@ class LibraryList extends React.Component {
 
 		if (filteredPresets) {
 			filteredPresets.forEach((preset) => {
-				const templateInfo = this.state.templateInfos.find(
+				const templateInfo = templateInfos.find(
 					template => preset.template === template.templateName,
 				) || {name: 'Undefined'};
-				const templateData = this.state.templatesData.find(
+				const templateData = templatesData.find(
 					e => e.name === preset.template,
 				);
 
@@ -350,16 +376,18 @@ class LibraryList extends React.Component {
 		const allTags = [];
 
 		families
-			&& this.state.templateInfos
+			&& templateInfos
 			&& families.forEach((family) => {
-				const templateInfo = this.state.templateInfos.find(
+				const templateInfo = templateInfos.find(
 					template => template.templateName === family.template,
 				);
 
 				if (!templateInfo) return;
-				const templateData = this.state.templatesData.find(
+				const templateData = templatesData.find(
 					e => e.name === family.template,
 				);
+
+				if (!templateData) return;
 
 				family.tags && family.tags.map(tag => allTags.push(tag));
 				const variantToLoad
@@ -401,16 +429,16 @@ class LibraryList extends React.Component {
 			});
 
 		this.props.subUsers
-			&& this.state.templateInfos
+			&& templateInfos
 			&& this.props.subUsers.forEach((subUser, index) => {
 				const subUserColor = subUserColors[index % subUserColors.length];
 
 				subUser.id !== this.props.user.id
 					&& subUser.library.forEach((family) => {
-						const templateInfo = this.state.templateInfos.find(
+						const templateInfo = templateInfos.find(
 							template => template.templateName === family.template,
 						) || {name: 'Undefined'};
-						const templateData = this.state.templatesData.find(
+						const templateData = templatesData.find(
 							e => e.name === family.template,
 						);
 

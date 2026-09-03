@@ -19,9 +19,7 @@ let mergeTimeoutRef;
 let instance;
 
 const getfsSelection = (weight, italic) =>
-	(weight > 500
-		? 0b0000000000100000
-		: 0b0000000001000000)
+	(weight > 500 ? 0b0000000000100000 : 0b0000000001000000)
 	| (italic ? 0b0000000000000001 : 0b0000000000000000);
 
 window.addEventListener('fluxServer.setup', () => {
@@ -89,24 +87,75 @@ async function mergeFont(url, action, params, arrayBuffer, mime = 'otf') {
 }
 
 export default class FontMediator {
+	hydrateTypedatas(typedatas) {
+		const initValues = {};
+		const glyphList = {};
+		const fontMakers = {};
+		const componentIdAndGlyphPerClass = {};
+
+		(typedatas || []).forEach((typedata) => {
+			if (!this.noCanvas && !process.env.LIBRARY) {
+				fontMakers[typedata.name] = new FontPrecursor(typedata.json);
+			}
+
+			glyphList[typedata.name] = typedata.json.glyphs;
+			componentIdAndGlyphPerClass[
+				typedata.name
+			] = getComponentIdAndGlyphPerClass(typedata);
+
+			const values = {};
+
+			typedata.json.controls.forEach((group) => {
+				group.parameters.forEach((param) => {
+					values[param.name] = param.init;
+				});
+			});
+
+			initValues[typedata.name] = values;
+		});
+
+		this.initValues = initValues;
+		this.glyphList = glyphList;
+		this.fontMakers = fontMakers;
+		this.componentIdAndGlyphPerClass = componentIdAndGlyphPerClass;
+
+		return this.componentIdAndGlyphPerClass;
+	}
+
+	templateIsReady(template) {
+		return Boolean(this.fontMakers && this.fontMakers[template]);
+	}
+
 	static async init(typedatas, workerPoolSize, noCanvas) {
 		instance = new FontMediator(workerPoolSize, noCanvas);
 
-		await instance.workerPool.workerReady;
-
-		if (typedatas) {
-			return instance
-				.addTemplate(typedatas)
-				.then((componentIdAndGlyphPerClass) => {
-					if (!process.env.LIBRARY) {
-						localClient.dispatchAction('/store-value-font', {
-							componentIdAndGlyphPerClass,
-						});
-					}
-				});
+		if (!typedatas) {
+			return undefined;
 		}
 
-		return Promise.resolve();
+		const hydrate = () => {
+			try {
+				const componentIdAndGlyphPerClass = instance.hydrateTypedatas(
+					typedatas,
+				);
+
+				if (!process.env.LIBRARY && localClient) {
+					localClient.dispatchAction('/store-value-font', {
+						componentIdAndGlyphPerClass,
+					});
+				}
+
+				instance.addTemplate(typedatas).catch((error) => {
+					console.error('FontMediator.addTemplate failed', error);
+				});
+			}
+			catch (error) {
+				console.error('FontMediator hydrate failed', error);
+			}
+		};
+
+		// Macrotask: React must paint the library before FontPrecursor work.
+		setTimeout(hydrate, 0);
 	}
 
 	static instance() {
@@ -118,52 +167,48 @@ export default class FontMediator {
 	}
 
 	constructor(workerPoolSize, noCanvas = false) {
+		this.workersHaveTemplates = false;
 		this.noCanvas = noCanvas;
-		this.workerPool = new WorkerPool(workerPoolSize);
+		this.workerPool = new WorkerPool(workerPoolSize || 1);
+		this.initValues = {};
+		this.glyphList = {};
+		this.fontMakers = {};
+		this.componentIdAndGlyphPerClass = {};
 	}
 
 	addTemplate(typedatas) {
+		const componentIdAndGlyphPerClass
+			= this.componentIdAndGlyphPerClass
+			&& Object.keys(this.componentIdAndGlyphPerClass).length
+				? this.componentIdAndGlyphPerClass
+				: this.hydrateTypedatas(typedatas);
+
 		return new Promise((resolve) => {
+			let settled = false;
+			const finish = () => {
+				if (settled) {
+					return;
+				}
+				settled = true;
+				resolve(componentIdAndGlyphPerClass);
+			};
+
+			const timeoutId = setTimeout(() => {
+				console.warn(
+					'Font workers did not acknowledge createFont; using main-thread precursors',
+				);
+				finish();
+			}, 120000);
+
 			this.workerPool.eachJob({
 				action: {
 					type: 'createFont',
 					data: typedatas,
 				},
 				callback: () => {
-					this.initValues = {};
-					this.glyphList = {};
-					this.fontMakers = {};
-					const componentIdAndGlyphPerClass = {};
-
-					if (!this.noCanvas) {
-						typedatas.forEach((typedata) => {
-							if (!process.env.LIBRARY) {
-								const font = new FontPrecursor(typedata.json);
-
-								this.fontMakers[typedata.name] = font;
-							}
-
-							this.glyphList[typedata.name] = typedata.json.glyphs;
-
-							componentIdAndGlyphPerClass[
-								typedata.name
-							] = getComponentIdAndGlyphPerClass(typedata);
-
-							const initValues = {};
-
-							typedata.json.controls.forEach((group) => {
-								group.parameters.forEach((param) => {
-									initValues[param.name] = param.init;
-								});
-							});
-
-							this.initValues[typedata.name] = initValues;
-						});
-						resolve(componentIdAndGlyphPerClass);
-					}
-					else {
-						resolve();
-					}
+					this.workersHaveTemplates = true;
+					clearTimeout(timeoutId);
+					finish();
 				},
 			});
 		});
@@ -300,6 +345,10 @@ export default class FontMediator {
 	}
 
 	async mergeFont(arrayBuffer) {
+		if (!process.env.MERGE) {
+			return arrayBuffer;
+		}
+
 		const buffer = await mergeFont(
 			MERGE_URL,
 			'mergefont',
@@ -444,18 +493,31 @@ export default class FontMediator {
 	}
 
 	getFont(fontName, template, params, subset, glyphCanvasUnicode) {
-		if (glyphCanvasUnicode && !this.noCanvas) {
-			const glyphForCanvas = this.fontMakers[template].constructFont(
-				{
-					...params,
-				},
-				[glyphCanvasUnicode],
-			);
+		if (!this.fontMakers || !this.fontMakers[template]) {
+			return Promise.resolve();
+		}
 
-			[window.glyph] = glyphForCanvas.glyphs;
-			localClient.dispatchAction('/store-value-font', {
-				glyph: Math.random(),
-			});
+		if (glyphCanvasUnicode && !this.noCanvas) {
+			try {
+				const glyphForCanvas = this.fontMakers[template].constructFont(
+					{
+						...params,
+					},
+					[glyphCanvasUnicode],
+				);
+
+				[window.glyph] = glyphForCanvas.glyphs;
+				localClient.dispatchAction('/store-value-font', {
+					glyph: Math.random(),
+				});
+			}
+			catch (error) {
+				console.error('FontMediator canvas constructFont failed', error);
+			}
+		}
+
+		if (!this.workersHaveTemplates) {
+			return Promise.resolve();
 		}
 
 		return this.getFontObject(fontName, 'Regular', template, params, subset)

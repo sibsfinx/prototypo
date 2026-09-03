@@ -6,6 +6,18 @@ import InlineSVG from 'svg-inline-react';
 import ReactMotionFlip from 'react-motion-flip';
 
 import CourseCard from './academy-course-card.components';
+import postitSvg from '../../../images/academy/postit.svg?raw';
+import iphoneSvg from '../../../images/academy/iphone.svg?raw';
+import redbookSvg from '../../../images/academy/redbook.svg?raw';
+import macbookSvg from '../../../images/academy/macbook.svg?raw';
+import penSvg from '../../../images/academy/pen.svg?raw';
+import coffeeSvg from '../../../images/academy/coffee.svg?raw';
+import rulerSvg from '../../../images/academy/ruler.svg?raw';
+import bluebookSvg from '../../../images/academy/bluebook.svg?raw';
+import paperSvg from '../../../images/academy/paper.svg?raw';
+import loupeSvg from '../../../images/academy/loupe.svg?raw';
+import blackpenSvg from '../../../images/academy/blackpen.svg?raw';
+import medalHomeSvg from '../../../images/academy/medal-home.svg?raw';
 
 class AcademyHome extends React.PureComponent {
 	constructor(props) {
@@ -118,63 +130,63 @@ class AcademyHome extends React.PureComponent {
 					<InlineSVG
 						className="academy-home-header-icon-postit"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=postit-!../../../images/academy/postit.svg')}
+						src={postitSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-iphone"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=iphone-!../../../images/academy/iphone.svg')}
+						src={iphoneSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-redbook"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=redbook-!../../../images/academy/redbook.svg')}
+						src={redbookSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-macbook"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=macbook-!../../../images/academy/macbook.svg')}
+						src={macbookSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-pen"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=pen-!../../../images/academy/pen.svg')}
+						src={penSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-coffee"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=coffee-!../../../images/academy/coffee.svg')}
+						src={coffeeSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-ruler"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=ruler-!../../../images/academy/ruler.svg')}
+						src={rulerSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-bluebook"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=bluebook-!../../../images/academy/bluebook.svg')}
+						src={bluebookSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-paper"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=paper-!../../../images/academy/paper.svg')}
+						src={paperSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-loupe"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=loupe-!../../../images/academy/loupe.svg')}
+						src={loupeSvg}
 					/>
 					<InlineSVG
 						className="academy-home-header-icon-blackpen"
 						element="div"
-						src={require('!svg-inline-loader?classPrefix=blackpen-!../../../images/academy/blackpen.svg')}
+						src={blackpenSvg}
 					/>
 					{academyCompleted && (
 						<InlineSVG
 							className="academy-home-header-icon-medal"
 							element="div"
-							src={require('!svg-inline-loader?classPrefix=medal-!../../../images/academy/medal-home.svg')}
+							src={medalHomeSvg}
 						/>
 					)}
 				</div>
