@@ -3,6 +3,7 @@ import {tmpdir} from 'os';
 import {join} from 'path';
 import {describe, it, before, after} from 'node:test';
 import assert from 'node:assert/strict';
+import opentype from 'opentype.js';
 import {
 	listTemplates,
 	getControls,
@@ -15,7 +16,11 @@ import {
 	setAlternate,
 	describeOpenTypeSupport,
 	exportOtf,
+	loadFontJson,
 } from '../../mcp/lib.mjs';
+import {defaultSubset} from '../../mcp/export.mjs';
+
+const SERBIAN_LATIN = ['ć', 'č', 'đ', 'š', 'ž', 'Ć', 'Č', 'Đ', 'Š', 'Ž'];
 
 describe('prototypo MCP handlers', () => {
 	let dbPath;
@@ -106,6 +111,18 @@ describe('prototypo MCP handlers', () => {
 		assert.equal(ot.standardLigatures, false);
 	});
 
+	it('subsets Serbian latinica from Grotesk and Antique Gothic', () => {
+		for (const templateName of ['venus.ptf', 'antique.ptf']) {
+			const subset = defaultSubset(loadFontJson(templateName));
+			for (const ch of SERBIAN_LATIN) {
+				assert.ok(
+					subset.includes(String(ch.codePointAt(0))),
+					`${templateName} subset missing ${ch}`,
+				);
+			}
+		}
+	});
+
 	it('bakes an alternate and exports an OTTO file', async () => {
 		const {variant} = createFamily(
 			{name: 'ExportMe', templateName: 'venus.ptf'},
@@ -128,5 +145,10 @@ describe('prototypo MCP handlers', () => {
 		assert.equal(result.glyphCount > 50, true);
 		const magic = readFileSync(outPath).subarray(0, 4).toString('ascii');
 		assert.equal(magic, 'OTTO');
+		const parsed = opentype.parse(readFileSync(outPath).buffer);
+		for (const ch of SERBIAN_LATIN) {
+			assert.notEqual(parsed.charToGlyph(ch).unicode, undefined, `cmap missing ${ch}`);
+			assert.notEqual(parsed.charToGlyph(ch).index, 0, `.notdef for ${ch}`);
+		}
 	});
 });

@@ -368,7 +368,15 @@ function slug(value) {
 }
 
 export async function exportOtf(
-	{variantId, outPath},
+	{
+		variantId,
+		outPath,
+		familyName,
+		styleName,
+		weight,
+		width,
+		italic,
+	},
 	dbPath = defaultDbPath(),
 ) {
 	const db = loadDb(dbPath);
@@ -381,29 +389,31 @@ export async function exportOtf(
 		throw new Error(`Family not found: ${variant.familyId}`);
 	}
 	const {buildOtf, writeOtfFile} = await import('./export.mjs');
+	const resolvedFamily = familyName || family.name;
+	const resolvedStyle = styleName || variant.name || 'Regular';
 	const {buffer, glyphCount} = buildOtf({
 		templateName: family.template,
 		values: variant.values || {},
-		familyName: family.name,
-		styleName: variant.name || 'Regular',
-		weight: variant.weight || 400,
-		width: variant.width || 'normal',
-		italic: Boolean(variant.italic),
+		familyName: resolvedFamily,
+		styleName: resolvedStyle,
+		weight: weight ?? variant.weight ?? 400,
+		width: width || variant.width || 'medium',
+		italic: italic ?? Boolean(variant.italic),
 	});
 	const dest
 		= outPath
 		|| join(
 			REPO_ROOT,
 			'mcp/demo/fonts',
-			`${slug(family.name)}-${slug(variant.name || 'Regular')}.otf`,
+			`${slug(resolvedFamily)}-${slug(resolvedStyle)}.otf`,
 		);
 	const path = writeOtfFile(buffer, dest);
 	return {
 		path,
 		bytes: buffer.byteLength,
 		glyphCount,
-		familyName: family.name,
-		styleName: variant.name || 'Regular',
+		familyName: resolvedFamily,
+		styleName: resolvedStyle,
 		templateName: family.template,
 		altList: (variant.values && variant.values.altList) || {},
 	};

@@ -11,6 +11,22 @@ const getfsSelection = (weight, italic) =>
 	(weight > 500 ? 0b0000000000100000 : 0b0000000001000000)
 	| (italic ? 0b0000000000000001 : 0b0000000000000000);
 
+function os2WidthClass(width) {
+	if (!width || width === 'normal') {
+		return 'medium';
+	}
+	return String(width);
+}
+
+function inSubsetRange(unicode) {
+	return (
+		unicode <= 0x00ff
+		|| (unicode >= 0x0100 && unicode <= 0x017f)
+		|| (unicode >= 0x2010 && unicode <= 0x2026)
+		|| unicode === 0x20ac
+	);
+}
+
 export function defaultSubset(fontJson) {
 	const unicodes = new Set();
 	for (const glyph of Object.values(fontJson.glyphs || {})) {
@@ -18,7 +34,7 @@ export function defaultSubset(fontJson) {
 		if (!Number.isFinite(unicode) || unicode <= 0) {
 			continue;
 		}
-		if (unicode <= 255 || (unicode >= 0x2010 && unicode <= 0x2026)) {
+		if (inSubsetRange(unicode)) {
 			unicodes.add(String(unicode));
 		}
 	}
@@ -57,7 +73,7 @@ export function buildOtf({
 		postScriptName: {},
 		unitsPerEm: 1024,
 		usWeightClass: weight,
-		usWidthClass: width,
+		usWidthClass: os2WidthClass(width),
 		manufacturer: 'Prototypo',
 		manufacturerURL: 'https://prototypo.io/',
 		designer: '',

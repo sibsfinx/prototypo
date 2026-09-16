@@ -51,9 +51,9 @@ Read `node_modules/<pkg>/dist/font.json` (same sources `scripts/copy-templates` 
 | `describe_opentype` | `templateName` | honest GSUB/liga/ssXX report (usually none) |
 | `export_otf` | `variantId`, optional `outPath` | path + byte size of an unmerged CFF OTF |
 
-`export_otf` runs `FontPrecursor` + `fontToSfntTable` in Node. No `merge.prototypo.io`. No GSUB: CSS `liga`/`dlig`/`ss01` will not change glyphs. Alternates must be baked with `set_alternate` first.
+`export_otf` runs `FontPrecursor` + `fontToSfntTable` in Node. No `merge.prototypo.io`. No GSUB: CSS `liga`/`dlig`/`ss01` will not change glyphs. Alternates must be baked with `set_alternate` first. Default subset is Latin-1 + Latin Extended-A (Serbian čćšžđ) + a slice of general punctuation.
 
-Specimen: `pnpm mcp:demo` writes `mcp/demo/fonts/*.otf`. Open `mcp/demo/index.html`.
+Specimen: `pnpm mcp:demo` writes Obala (display) and Kej (text) OTFs plus `skoljka-typefaces.zip`. Open `mcp/demo/index.html`.
 
 ## Security
 

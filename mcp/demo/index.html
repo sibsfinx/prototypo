@@ -1,200 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Poster Display / Reader Text — Prototypo MCP specimen</title>
+	<title>Obala / Kej — typefaces for Školjka production</title>
 	<style>
 		@font-face {
-			font-family: "Poster Display";
-			src: url("./fonts/PosterDisplay-Regular.otf") format("opentype");
+			font-family: "Obala";
+			src: url("./fonts/Obala-Bold.otf") format("opentype");
+			font-weight: 700;
+			font-style: normal;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Obala";
+			src: url("./fonts/Obala-Black.otf") format("opentype");
+			font-weight: 800 900;
+			font-style: normal;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Kej";
+			src: url("./fonts/Kej-Regular.otf") format("opentype");
 			font-weight: 400;
 			font-style: normal;
 			font-display: block;
 		}
 		@font-face {
-			font-family: "Reader Text";
-			src: url("./fonts/ReaderText-Regular.otf") format("opentype");
-			font-weight: 400;
+			font-family: "Kej";
+			src: url("./fonts/Kej-Medium.otf") format("opentype");
+			font-weight: 500;
 			font-style: normal;
 			font-display: block;
 		}
 
 		:root {
-			--ink: #11110f;
-			--paper: #f4efe6;
-			--rule: #11110f;
+			--ink: #111111;
+			--paper: #ffffff;
+			--mute: #6b6b6b;
+			--rule: #e8e8e8;
 		}
 
 		* { box-sizing: border-box; }
 		html, body { margin: 0; background: var(--paper); color: var(--ink); }
 		body {
-			font-family: "Reader Text", Georgia, serif;
-			font-size: 21px;
-			line-height: 1.45;
+			font-family: "Kej", system-ui, sans-serif;
+			font-size: 18px;
+			line-height: 1.65;
+			font-weight: 400;
 		}
 
-		.page { max-width: 920px; margin: 0 auto; padding: 48px 28px 96px; }
+		.bar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			padding: 18px 28px;
+			border-bottom: 1px solid var(--rule);
+			font-size: 14px;
+		}
+		.bar nav { display: flex; gap: 22px; color: var(--mute); }
+		.logo { font-family: "Kej", sans-serif; font-weight: 500; }
+		.btn {
+			display: inline-block;
+			background: #000;
+			color: #fff;
+			text-decoration: none;
+			padding: 10px 16px;
+			font-family: "Kej", sans-serif;
+			font-weight: 500;
+			font-size: 14px;
+			border: 1px solid #000;
+		}
+		.btn.ghost {
+			background: #fff;
+			color: #000;
+		}
+
+		.page { max-width: 980px; margin: 0 auto; padding: 56px 28px 120px; }
 		.kicker {
-			font-family: "Reader Text", Georgia, serif;
-			font-size: 13px;
-			letter-spacing: 0.16em;
+			font-size: 12px;
+			letter-spacing: 0.14em;
 			text-transform: uppercase;
-			margin: 0 0 12px;
+			color: var(--mute);
+			margin: 0 0 14px;
 		}
 		h1 {
-			font-family: "Poster Display", "Antique Gothic", sans-serif;
-			font-size: clamp(56px, 12vw, 128px);
-			line-height: 0.88;
-			letter-spacing: -0.04em;
-			font-weight: 400;
+			font-family: "Obala", sans-serif;
+			font-weight: 900;
+			font-size: clamp(40px, 6.4vw, 72px);
+			line-height: 1.05;
+			letter-spacing: -0.025em;
+			margin: 0 0 22px;
+			max-width: 22ch;
+		}
+		.lede {
+			max-width: 36em;
+			color: #333;
 			margin: 0 0 28px;
 		}
-		.deck {
-			max-width: 38em;
-			margin: 0 0 40px;
-		}
-		hr { border: 0; border-top: 1px solid var(--rule); margin: 40px 0; }
-
-		h2 {
-			font-family: "Poster Display", sans-serif;
-			font-size: 42px;
-			line-height: 1;
-			letter-spacing: -0.03em;
-			font-weight: 400;
-			margin: 0 0 16px;
-		}
-		p { margin: 0 0 1em; max-width: 38em; }
-
-		.compare {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 24px;
-			margin: 24px 0 8px;
-		}
-		.compare figure {
-			margin: 0;
-			padding: 20px 18px 16px;
-			border: 1px solid var(--rule);
-		}
-		.compare figcaption {
+		.meta {
 			font-size: 12px;
 			letter-spacing: 0.08em;
 			text-transform: uppercase;
-			margin-bottom: 12px;
+			color: var(--mute);
+			margin: 0 0 28px;
 		}
-		.liga-sample {
-			font-size: 28px;
-			line-height: 1.3;
+		.actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 56px; }
+
+		h2 {
+			font-family: "Obala", sans-serif;
+			font-weight: 700;
+			font-size: clamp(28px, 4vw, 40px);
+			line-height: 1.12;
+			letter-spacing: -0.02em;
+			margin: 0 0 14px;
 		}
-		.on {
-			font-feature-settings: "liga" 1, "dlig" 1, "calt" 1, "ss01" 1, "salt" 1;
-			font-variant-ligatures: common-ligatures discretionary-ligatures;
+		h3 {
+			font-family: "Kej", sans-serif;
+			font-weight: 500;
+			font-size: 22px;
+			line-height: 1.25;
+			margin: 0 0 8px;
 		}
-		.off {
-			font-feature-settings: "liga" 0, "dlig" 0, "calt" 0, "ss01" 0, "salt" 0;
-			font-variant-ligatures: none;
+		p { margin: 0 0 1em; max-width: 38em; }
+
+		hr { border: 0; border-top: 1px solid var(--rule); margin: 48px 0; }
+
+		.grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 28px 36px;
 		}
-		.display-line {
-			font-family: "Poster Display", sans-serif;
+		.proof {
+			font-family: "Obala", sans-serif;
+			font-weight: 900;
 			font-size: 56px;
 			line-height: 1;
-			letter-spacing: -0.04em;
-		}
-		.nums {
-			font-family: "Poster Display", sans-serif;
-			font-size: 48px;
 			letter-spacing: -0.03em;
+			margin: 0 0 8px;
 		}
-		.note {
-			font-size: 16px;
-			max-width: 42em;
+		.proof.bold { font-weight: 700; font-size: 42px; }
+		.proof.body {
+			font-family: "Kej", sans-serif;
+			font-weight: 400;
+			font-size: 28px;
+			letter-spacing: 0;
+			line-height: 1.2;
 		}
-		ul { max-width: 42em; padding-left: 1.2em; }
-		li { margin: 0 0 0.45em; }
-		code { font-size: 0.86em; }
+		.proof.medium {
+			font-family: "Kej", sans-serif;
+			font-weight: 500;
+			font-size: 28px;
+			letter-spacing: 0;
+			line-height: 1.2;
+		}
+		.alpha {
+			font-size: 28px;
+			line-height: 1.35;
+			letter-spacing: -0.02em;
+			max-width: none;
+		}
+		.alpha.kej {
+			font-family: "Kej", sans-serif;
+			font-weight: 400;
+			font-size: 22px;
+			letter-spacing: 0;
+			line-height: 1.5;
+		}
+		.downloads a { display: inline-block; margin: 0 12px 10px 0; }
+		.note { font-size: 15px; color: #333; max-width: 42em; }
+		code { font-size: 0.88em; }
 
 		@media (max-width: 720px) {
-			.compare { grid-template-columns: 1fr; }
-			body { font-size: 19px; }
+			.grid { grid-template-columns: 1fr; }
+			.bar nav { display: none; }
+			body { font-size: 17px; }
 		}
 	</style>
 </head>
 <body>
+	<header class="bar">
+		<div class="logo">Školjka production</div>
+		<nav>
+			<span>Usluge</span>
+			<span>Portfolio</span>
+			<span>Blog</span>
+			<span>Kontakt</span>
+		</nav>
+		<a class="btn" href="./fonts/skoljka-typefaces.zip">Preuzmi fontove</a>
+	</header>
+
 	<main class="page">
-		<p class="kicker">Prototypo MCP specimen · Antique Gothic + Spectral</p>
-		<h1>Quiet type<br>for loud paper</h1>
-		<p class="deck">
-			Two families from the local MCP: a display cut of Antique Gothic
-			(<em>Poster Display</em>) and a text cut of Spectral
-			(<em>Reader Text</em>). Pairing follows the same split Hoefler&amp;Co
-			makes between Multipurpose/headline faces and ScreenSmart text,
-			and that CSTM makes between Kazimir and Kazimir Text: wider, higher
-			contrast, and baked alternates for the poster; lower contrast, more
-			spacing, and default forms for reading.
-		</p>
-
-		<p>
-			The affiliate office of the typical city still sells the same
-			five-and-dime story: efficient, official, slightly too pleased
-			with itself. 1519 was a better year for Q. The rain in Spain stays
-			mainly in the plains, and the firefly flickers after midnight.
-		</p>
-
-		<hr>
-
-		<h2>Ligatures &amp; features</h2>
-		<p class="note">
-			Both columns use the same string. The left asks CSS for
-			<code>liga</code>, <code>dlig</code>, <code>calt</code>,
-			<code>ss01</code>, <code>salt</code>. The right turns them off.
-			If this app exported GSUB, “office”, “affiliate”, and “ffi”
-			would change. They will not: the OTF writer emits CFF outlines
-			and cmap only. There are no <code>fi</code>/<code>fl</code>
-			ligature glyphs in the templates.
-		</p>
-		<div class="compare">
-			<figure>
-				<figcaption>features on</figcaption>
-				<div class="liga-sample on">office affiliate efficient firefly</div>
-			</figure>
-			<figure>
-				<figcaption>features off</figcaption>
-				<div class="liga-sample off">office affiliate efficient firefly</div>
-			</figure>
+		<p class="kicker">Merch studio — Beograd</p>
+		<h1>Custom merch, reklamni materijal i unikatni komadi za brendove, kompanije, evente</h1>
+		<p class="lede">Od briefa do uzorka i produkcije — custom merch iz Beograda, isporuka u regionu i EU. Ponuda u roku od 24 sata.</p>
+		<p class="meta">20+ godina u tekstilnom merču · Beograd · EU isporuka</p>
+		<div class="actions">
+			<a class="btn" href="./fonts/Obala-Black.otf">Obala Black</a>
+			<a class="btn ghost" href="./fonts/Kej-Regular.otf">Kej Regular</a>
 		</div>
 
-		<p class="note">
-			Alternates <em>do</em> exist, but they are selected in the editor
-			(<code>altList</code>) and baked into cmap before export. Poster
-			Display used <code>a_alt</code>, <code>t_alt</code>,
-			<code>y_alt</code>, <code>one_alt</code>, <code>five_alt</code>,
-			<code>Q_alt</code> where the Antique Gothic source had them.
-			That is not an OpenType stylistic set; CSS cannot toggle it.
-		</p>
-		<p class="display-line">Quality at 1519</p>
-		<p class="nums">1519 / $52</p>
+		<div class="grid">
+			<section>
+				<p class="kicker">Obala · headline</p>
+				<h3>Merch koji se nosi</h3>
+				<p>Hudi, polo, haljine, peškiri, kape. Custom kroj i gusti šavovi da logo ima težinu — i da se nosi.</p>
+			</section>
+			<section>
+				<p class="kicker">Kej · body</p>
+				<h3>Welcome i poklon setovi</h3>
+				<p>Paketi koji stanu u ručni prtljag: lokalni specijaliteti, analog foto-setovi, ništa suvišno. Oko pravog briefa.</p>
+			</section>
+			<section>
+				<h3>Objekti za sto</h3>
+				<p>3D maskote, svetiljke od boca, grow-kitovi. Ostaju na stolu jer nešto rade, ne zbog logoa.</p>
+			</section>
+			<section>
+				<h3>Kad majica nije odgovor</h3>
+				<p>Gravura, sublimacija, koža, neočekivani nosači. Za briefove koji nisu još jedan print na pamuku.</p>
+			</section>
+		</div>
 
 		<hr>
 
-		<h2>What serious foundries ship that we do not</h2>
+		<p class="kicker">Pairing</p>
+		<h2>Obala na naslovima, Kej u čitanju</h2>
 		<p class="note">
-			Read against <a href="https://www.typography.com/">typography.com</a>
-			(Gotham, Ringside, Chronicle, Whitney ScreenSmart),
-			<a href="https://cstmfonts.com/en">CSTM Fonts</a>, and
-			<a href="https://type.today/en/kazimir-text/regular">Kazimir Text</a>
-			on type.today:
+			Made in Prototypo for
+			<a href="https://deploy-preview-1--balkanska-skoljka.netlify.app/sr">Školjka production</a>.
+			Both cuts start from Prototypo Grotesk, then split like CSTM’s display/text optical sizes and Commercial Type’s Graphik-weight stack — not their outlines.
+			Obala is the headline size: heavier, slightly wide, higher x-height, tighter, a bit more contrast, baked <code>Q_alt</code>.
+			Kej is the reading size: lower contrast, modest aperture so G stays a G, extra spacing, č ć š ž đ kept clear at 16–18px.
 		</p>
-		<ul class="note">
-			<li><strong>Optical size as a product, not a slider guess.</strong> H&amp;Co ScreenSmart vs Multipurpose; CSTM Kazimir vs Kazimir Text. We faked it with thickness/contrast/spacing on one Regular.</li>
-			<li><strong>A family tree.</strong> Weights, widths, italics with consistent intervals. We export one Regular per experiment.</li>
-			<li><strong>OpenType GSUB/GPOS.</strong> Standard + discretionary ligatures, stylistic sets, case-sensitive punctuation, kerning. Our OTTO files have none of this.</li>
-			<li><strong>Figure sets.</strong> Lining/oldstyle, tabular/proportional, slashed zero, fractions, superiors. One set of lining figures, no feature tags.</li>
-			<li><strong>Small caps.</strong> Prototypo has small-cap sliders; they are not a <code>smcp</code> feature.</li>
-			<li><strong>Language coverage.</strong> CSTM’s job is often Cyrillic (and Georgian). Our templates are Latin, incomplete accents, no Cyrillic.</li>
-			<li><strong>Variable fonts.</strong> Normalidad / Xprmntl 03 / Kazimir VF. We interpolate params in the editor, then flatten to static CFF.</li>
-			<li><strong>Web packaging.</strong> WOFF2, subsetting by language, licensed CSS kits. We drop a raw <code>.otf</code> into <code>@font-face</code>.</li>
-		</ul>
+
+		<hr>
+
+		<p class="kicker">Obala Black</p>
+		<p class="proof">Hamburgefonstiv</p>
+		<p class="proof">Školjka čaša žudnja</p>
+		<p class="alpha">AÁBCČĆDĐEFGHIJKLMNOPQRSŠTUVWXYZŽ<br>aábcčćdđefghijklmnopqrsštuvwxyzž<br>0123456789 € / @ &amp;</p>
+
+		<p class="kicker">Obala Bold</p>
+		<p class="proof bold">Zatražite ponudu</p>
+		<p class="proof bold">Reklamni materijal</p>
+
+		<p class="kicker">Kej Regular</p>
+		<p class="proof body">Hamburgefonstiv čćšžđ</p>
+		<p class="alpha kej">AÁBCČĆDĐEFGHIJKLMNOPQRSŠTUVWXYZŽ<br>aábcčćdđefghijklmnopqrsštuvwxyzž<br>0123456789 € / @ &amp;</p>
+		<p>
+			The rain in Spain stays mainly in the plains. Affiliate office, efficient firefly,
+			quality at 1519. Beograd, Sava, Dunav — merch koji se koristi, ne tote torba iz kataloga.
+			Čokolada, ćevap, šljiva, žurka, đak.
+		</p>
+
+		<p class="kicker">Kej Medium</p>
+		<p class="proof medium">Usluge · Portfolio · Kontakt</p>
+
+		<hr>
+
+		<p class="kicker">Downloads</p>
+		<h2>Preuzmi OTF</h2>
+		<p class="downloads">
+			<a href="./fonts/Obala-Black.otf">Obala-Black.otf</a>
+			<a href="./fonts/Obala-Bold.otf">Obala-Bold.otf</a>
+			<a href="./fonts/Kej-Regular.otf">Kej-Regular.otf</a>
+			<a href="./fonts/Kej-Medium.otf">Kej-Medium.otf</a>
+			<a href="./fonts/skoljka-typefaces.zip">skoljka-typefaces.zip</a>
+		</p>
+		<p class="note">
+			Unmerged CFF (OTTO). No GSUB/GPOS. Serbian latinica is in the cmap.
+			Alternates on Obala are baked, not stylistic sets.
+		</p>
 	</main>
 </body>
 </html>
