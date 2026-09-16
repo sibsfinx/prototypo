@@ -157,45 +157,113 @@ const cuts = [
 	},
 ];
 
-const exported = [];
+const FINX_SHARED = {
+	width: 1.12,
+	xHeight: 538,
+	capDelta: 248,
+	ascender: 230,
+	descender: -195,
+	crossbar: 1.02,
+	diacriticHeight: 82,
+	overshoot: 8,
+	opticThickness: 0.97,
+	aperture: 1.06,
+	apertureTop: 1.0,
+	apertureBottom: 1.1,
+	curviness: 0.56,
+	serifWidth: 0.1,
+	serifHeight: 0.001,
+};
 
-for (const cut of cuts) {
-	const created = createFamily(
-		{name: `${cut.familyName} ${cut.styleName}`, templateName: cut.templateName},
-		dbPath,
-	);
-	setParams({variantId: created.variant.id, values: cut.values}, dbPath);
-	const alts = applyAlts(created.variant.id, cut.templateName, cut.alts);
-	const file = await exportOtf(
-		{
-			variantId: created.variant.id,
-			outPath: join(fontsDir, cut.file),
-			familyName: cut.familyName,
-			styleName: cut.styleName,
-			weight: cut.weight,
-			width: cut.width,
+const finxCuts = [
+	{
+		file: 'Finx-Regular.otf',
+		familyName: 'Finx',
+		styleName: 'Regular',
+		templateName: 'venus.ptf',
+		weight: 400,
+		width: 'semi_expanded',
+		alts: [],
+		values: {
+			...FINX_SHARED,
+			thickness: 68,
+			_contrast: -0.48,
+			_contrastExtremity: -0.56,
+			spacing: 0.08,
+			xHeight: 548,
+			width: 1.1,
 		},
-		dbPath,
+	},
+	{
+		file: 'Finx-Book.otf',
+		familyName: 'Finx',
+		styleName: 'Book',
+		templateName: 'venus.ptf',
+		weight: 300,
+		width: 'semi_expanded',
+		alts: [],
+		values: {
+			...FINX_SHARED,
+			thickness: 80,
+			_contrast: -0.46,
+			_contrastExtremity: -0.55,
+			spacing: 0.1,
+			aperture: 1.1,
+			apertureBottom: 1.14,
+			width: 1.08,
+		},
+	},
+];
+
+async function exportProject(projectCuts, zipName) {
+	const exported = [];
+	for (const cut of projectCuts) {
+		const created = createFamily(
+			{name: `${cut.familyName} ${cut.styleName}`, templateName: cut.templateName},
+			dbPath,
+		);
+		setParams({variantId: created.variant.id, values: cut.values}, dbPath);
+		const alts = applyAlts(created.variant.id, cut.templateName, cut.alts);
+		const file = await exportOtf(
+			{
+				variantId: created.variant.id,
+				outPath: join(fontsDir, cut.file),
+				familyName: cut.familyName,
+				styleName: cut.styleName,
+				weight: cut.weight,
+				width: cut.width,
+			},
+			dbPath,
+		);
+		exported.push({...file, alts, file: cut.file});
+	}
+	const zip = new JSZip();
+	for (const item of exported) {
+		zip.file(item.file, readFileSync(item.path));
+	}
+	const zipPath = join(fontsDir, zipName);
+	writeFileSync(
+		zipPath,
+		await zip.generateAsync({type: 'nodebuffer', compression: 'DEFLATE'}),
 	);
-	exported.push({...file, alts, file: cut.file});
+	return {zip: zipPath, exported};
 }
 
-const zip = new JSZip();
-for (const item of exported) {
-	zip.file(item.file, readFileSync(item.path));
-}
-writeFileSync(
-	join(fontsDir, 'skoljka-typefaces.zip'),
-	await zip.generateAsync({type: 'nodebuffer', compression: 'DEFLATE'}),
-);
+const skoljka = await exportProject(cuts, 'skoljka-typefaces.zip');
+const finx = await exportProject(finxCuts, 'finx-typefaces.zip');
 
 console.log(
 	JSON.stringify(
 		{
 			dbPath,
-			html: join(repoRoot, 'mcp/demo/index.html'),
-			zip: join(fontsDir, 'skoljka-typefaces.zip'),
-			exported,
+			skoljka: {
+				html: join(repoRoot, 'mcp/demo/index.html'),
+				...skoljka,
+			},
+			alexmesch: {
+				html: join(repoRoot, 'mcp/demo/alexmesch.html'),
+				...finx,
+			},
 		},
 		null,
 		2,

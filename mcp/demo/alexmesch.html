@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Finx — typefaces for alexmesch.com</title>
+	<style>
+		@font-face {
+			font-family: "Finx";
+			src: url("./fonts/Finx-Book.otf") format("opentype");
+			font-weight: 300;
+			font-style: normal;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Finx";
+			src: url("./fonts/Finx-Regular.otf") format("opentype");
+			font-weight: 400;
+			font-style: normal;
+			font-display: block;
+		}
+
+		* { box-sizing: border-box; }
+		html, body {
+			margin: 0;
+			background: #fff;
+			color: #020202;
+		}
+		body {
+			font-family: "Finx", "Gira Sans", sans-serif;
+			font-weight: 300;
+			font-size: 15px;
+			line-height: 1.8;
+		}
+
+		.cover {
+			max-width: 1100px;
+			margin: 0 auto;
+			padding: 48px 28px 24px;
+			display: grid;
+			grid-template-columns: 1fr 220px;
+			gap: 48px;
+		}
+		.portrait {
+			width: 110px;
+			height: 110px;
+			border-radius: 50%;
+			object-fit: cover;
+			display: block;
+			margin: 0 0 28px;
+		}
+		h1 {
+			font-family: "Finx", sans-serif;
+			font-weight: 400;
+			font-size: 28px;
+			line-height: 1.5;
+			letter-spacing: 0;
+			margin: 0;
+			max-width: 22em;
+		}
+		nav {
+			padding-top: 138px;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px 24px;
+			align-content: start;
+			font-size: 14px;
+			font-weight: 300;
+		}
+		nav a {
+			color: #020202;
+			text-decoration: none;
+		}
+		nav a:hover { color: #30f; }
+
+		main {
+			max-width: 1100px;
+			margin: 0 auto;
+			padding: 12px 28px 96px;
+		}
+		.prose {
+			max-width: 40em;
+			margin-left: 0;
+		}
+		.prose p { margin: 0 0 1em; }
+		.prose a {
+			color: #000;
+			border-bottom: 1px solid rgba(0,0,0,0.5);
+			text-decoration: none;
+		}
+		.prose a:hover {
+			color: #30f;
+			border-bottom-color: #30f;
+		}
+
+		hr {
+			border: 0;
+			border-top: 1px solid #eee;
+			margin: 56px 0 40px;
+			max-width: 40em;
+		}
+		.kicker {
+			font-size: 11px;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: #9a9a9a;
+			margin: 0 0 8px;
+		}
+		h2 {
+			font-weight: 400;
+			font-size: 19px;
+			line-height: 1.4;
+			margin: 0 0 12px;
+			color: #000;
+		}
+		.proof {
+			font-weight: 400;
+			font-size: 28px;
+			line-height: 1.35;
+			margin: 0 0 12px;
+			max-width: 22em;
+		}
+		.proof.book {
+			font-weight: 300;
+			font-size: 22px;
+		}
+		.alpha {
+			font-size: 22px;
+			line-height: 1.45;
+			max-width: none;
+		}
+		.alpha.book { font-weight: 300; font-size: 18px; }
+		.downloads a { display: inline-block; margin: 0 14px 8px 0; }
+		.note { font-size: 14px; color: #333; max-width: 42em; }
+
+		@media (max-width: 800px) {
+			.cover { grid-template-columns: 1fr; }
+			nav { padding-top: 24px; }
+			h1 { font-size: 24px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="cover">
+		<div>
+			<img class="portrait" src="./images/alexander-mescheryakov.jpg" alt="">
+			<h1>Alexander Mescheryakov,<br>an AI–native product engineer with fullstack, engineering management and product experience, building scalable systems from 0 to 1 and delivering end–to–end</h1>
+		</div>
+		<nav>
+			<a href="https://alexmesch.com/about/">About</a>
+			<a href="https://alexmesch.com/work/">Work</a>
+			<a href="https://github.com/sibsfinx">GitHub</a>
+			<a href="https://www.linkedin.com/in/alexmesch/">LinkedIn</a>
+			<a href="https://wellfound.com/u/sibsfinx">Wellfound</a>
+			<a href="https://medium.com/@sibsfinx">Medium</a>
+			<a href="https://dribbble.com/sibsfinx">Dribbble</a>
+		</nav>
+	</div>
+	<main>
+		<div class="prose">
+			<p>I'm Alexander Mescheryakov, a Lead / Senior Software Engineer with 15 years of experience building and scaling SaaS and e-commerce products. I focus on business needs: clarifying requirements in quick iterations, building prototypes and proof–of–concepts, leading engineering teams, and coordinating external partners. I've worked across e-commerce and marketing analytics, 3D/CAD/AR collaboration, project management, security and video, and healthcare — including US healthcare/insurance and UK healthcare/wellness/performance. A strong part of my work is supporting sales and marketing — reliable client-facing product, faster release cycles, and outcomes that help go-to-market and growth.</p>
+			<p>As a team lead and hands-on engineer, I own delivery end to end while working with stakeholders and external teams. At Littledata, I rebuilt a Shopify data-layer product for analytics and multi-channel advertising — reducing client-facing production issues to zero and shortening the design, engineering, and QA cycle by approximately 50%. At Vectary, I led engineering on a 3D/CAD/AR collaboration platform that improved application loading by 10× and monorepo builds by 20×. Earlier product engineering includes Fohlio and IQ300 growth outcomes, plus work with teams including 3dEYE, US healthcare/insurance, and UK healthcare/wellness/performance.</p>
+			<p>Contact me through LinkedIn at <a href="https://www.linkedin.com/in/alexmesch/">https://www.linkedin.com/in/alexmesch/</a> or by email at <a href="mailto:hello@alexmesch.com">hello@alexmesch.com</a>.</p>
+		</div>
+
+		<hr>
+		<p class="kicker">Finx Regular · headline</p>
+		<p class="proof">Hamburgefonstiv 0123</p>
+		<p class="alpha">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 € / @ &amp;</p>
+
+		<p class="kicker">Finx Book · body</p>
+		<p class="proof book">Hamburgefonstiv 0123</p>
+		<p class="alpha book">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 € / @ &amp;</p>
+		<p class="note">
+			Same job as Gira Sans on
+			<a href="https://alexmesch.com/">alexmesch.com</a>:
+			a light, wide grotesk for a 28px sentence title and 15px reading.
+			Not a copy — Prototypo Grotesk, slightly rounder, no Typekit.
+		</p>
+		<p class="kicker">Downloads</p>
+		<p class="downloads">
+			<a href="./fonts/Finx-Regular.otf">Finx-Regular.otf</a>
+			<a href="./fonts/Finx-Book.otf">Finx-Book.otf</a>
+			<a href="./fonts/finx-typefaces.zip">finx-typefaces.zip</a>
+		</p>
+	</main>
+</body>
+</html>
