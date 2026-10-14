@@ -57,6 +57,8 @@ Specimen: `pnpm mcp:demo` writes Obala/Kej (Školjka) and Finx Regular/Book (ale
 
 Logo optical sizes (not text): `pnpm mcp:demo:logos` writes Skoljka Logo UltraBold and Humanist (Grotesk), UltraContrast and Elegant (Spectral), FellContrast — readable tall logo DNA — plus `skoljka-logo-typefaces.zip`. Open `mcp/demo/logo.html` — mark is **54** only.
 
+Elegant mixes (Spectral, black ink): `mcp/demo/logo-elegant-10.html` and `skoljka-logo-elegant-10.zip` — ten combinations of ultra-bold, black, taller, and higher contrast.
+
 ## Security
 
 Local process, local files only. Does not fetch fonts or upload values. `templateName` is allow-listed to the five packages (no path traversal into `node_modules`/elsewhere). `set_param` rejects names that are not in that template's controls.
