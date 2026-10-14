@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Logo optical sizes for Školjka seafood — not text faces.
- * Anagrama-leaning: Swiss precision, custom wordmark energy, three poles.
+ * Several bases, taller solid proportions, Anagrama wordmark energy.
  */
 import '../register-app.mjs';
 import {rmSync, existsSync, mkdirSync, readFileSync, writeFileSync} from 'fs';
@@ -20,103 +20,153 @@ if (existsSync(dbPath)) {
 }
 mkdirSync(fontsDir, {recursive: true});
 
-/**
- * Shared logo optical DNA: high x-height for short marks ("54"),
- * capped descenders, no serifs on grotesk cuts.
- */
-const LOGO_GROTESK = {
-	xHeight: 620,
-	capDelta: 140,
-	ascender: 120,
-	descender: -110,
-	crossbar: 1,
-	diacriticHeight: 60,
-	overshoot: 14,
-	serifWidth: 0.1,
-	serifHeight: 0.001,
-};
-
-const LOGO_DIDONE = {
-	xHeight: 560,
-	capDelta: 180,
-	ascender: 160,
-	descender: -130,
-	crossbar: 0.98,
-	diacriticHeight: 70,
-	overshoot: 10,
+/** Tall + solid logo DNA shared across sans bases */
+const TALL_SOLID = {
+	xHeight: 700,
+	capDelta: 110,
+	ascender: 100,
+	descender: -95,
+	crossbar: 1.02,
+	diacriticHeight: 55,
+	overshoot: 12,
 };
 
 const cuts = [
 	{
-		// Massive stamp — Boom Bowl energy; counters kept open (peer review)
+		// Neo-grotesk stamp — Prototypo Grotesk
 		file: 'SkoljkaLogo-UltraBold.otf',
 		familyName: 'Skoljka Logo',
 		styleName: 'UltraBold',
 		templateName: 'venus.ptf',
 		weight: 900,
-		width: 'expanded',
+		width: 'semi_condensed',
 		values: {
-			...LOGO_GROTESK,
-			thickness: 148,
-			_contrast: -0.42,
-			_contrastExtremity: -0.48,
-			width: 1.12,
+			...TALL_SOLID,
+			thickness: 150,
+			_contrast: -0.38,
+			_contrastExtremity: -0.45,
+			width: 0.92,
 			spacing: -0.02,
-			opticThickness: 1.02,
-			aperture: 1.05,
-			apertureTop: 1.02,
-			apertureBottom: 1.14,
-			curviness: 0.42,
+			opticThickness: 1.04,
+			aperture: 1.02,
+			apertureTop: 1.0,
+			apertureBottom: 1.1,
+			curviness: 0.4,
+			serifWidth: 0.1,
+			serifHeight: 0.001,
 		},
 	},
 	{
-		// Hairline vs slab — Magno / Sofia hospitality contrast
+		// Humanistic grotesque — Antique Gothic, tall + solid (low contrast)
+		file: 'SkoljkaLogo-Humanist.otf',
+		familyName: 'Skoljka Logo',
+		styleName: 'Humanist',
+		templateName: 'antique.ptf',
+		weight: 800,
+		width: 'semi_condensed',
+		values: {
+			...TALL_SOLID,
+			xHeight: 740,
+			capDelta: 80,
+			thickness: 140,
+			_contrast: -0.15,
+			_contrastExtremity: -0.2,
+			width: 0.86,
+			spacing: 0.02,
+			opticThickness: 1.0,
+			aperture: 1.28,
+			apertureTop: 1.18,
+			apertureBottom: 1.34,
+			curviness: 0.66,
+			serifWidth: 0.05,
+			serifHeight: 0.001,
+		},
+	},
+	{
+		// Ultra contrast didone — Spectral (new base vs prior Elzevir)
 		file: 'SkoljkaLogo-UltraContrast.otf',
 		familyName: 'Skoljka Logo',
 		styleName: 'UltraContrast',
-		templateName: 'elzevir.ptf',
+		templateName: 'gfnt.ptf',
 		weight: 700,
-		width: 'medium',
+		width: 'condensed',
 		values: {
-			...LOGO_DIDONE,
-			thickness: 128,
-			_contrast: -1.22,
-			_contrastExtremity: -1.15,
-			width: 0.94,
-			spacing: 0,
-			opticThickness: 1.05,
-			aperture: 1.14,
-			apertureTop: 1.06,
-			apertureBottom: 1.18,
-			curviness: 0.52,
-			serifWidth: 52,
-			serifHeight: 11,
-			capDelta: 160,
+			xHeight: 640,
+			capDelta: 150,
+			ascender: 140,
+			descender: -120,
+			crossbar: 0.98,
+			diacriticHeight: 65,
 			overshoot: 8,
+			thickness: 122,
+			_contrast: -1.26,
+			_contrastExtremity: -1.2,
+			width: 0.86,
+			spacing: 0,
+			opticThickness: 1.08,
+			aperture: 1.12,
+			apertureTop: 1.04,
+			apertureBottom: 1.16,
+			curviness: 0.55,
+			serifWidth: 48,
+			serifHeight: 28,
 		},
 	},
 	{
-		// Pearl-light Swiss quiet — thickness 54 kept as logo cipher
+		// Old-style contrast alternate — John Fell
+		file: 'SkoljkaLogo-FellContrast.otf',
+		familyName: 'Skoljka Logo',
+		styleName: 'FellContrast',
+		templateName: 'john-fell.ptf',
+		weight: 700,
+		width: 'condensed',
+		values: {
+			xHeight: 660,
+			capDelta: 160,
+			ascender: 130,
+			descender: -110,
+			crossbar: 1,
+			diacriticHeight: 60,
+			overshoot: 8,
+			thickness: 118,
+			_contrast: -1.85,
+			width: 0.9,
+			spacing: 0.02,
+			opticThickness: 1.1,
+			aperture: 1.08,
+			curviness: 0.5,
+			serifWidth: 42,
+			serifHeight: 14,
+		},
+	},
+	{
+		// Quiet elegant — Elzevir light, tall
 		file: 'SkoljkaLogo-Elegant.otf',
 		familyName: 'Skoljka Logo',
 		styleName: 'Elegant',
-		templateName: 'venus.ptf',
+		templateName: 'elzevir.ptf',
 		weight: 300,
-		width: 'semi_expanded',
+		width: 'semi_condensed',
 		values: {
-			...LOGO_GROTESK,
-			xHeight: 580,
-			capDelta: 170,
+			xHeight: 680,
+			capDelta: 130,
+			ascender: 110,
+			descender: -100,
+			crossbar: 1,
+			diacriticHeight: 60,
+			overshoot: 10,
 			thickness: 58,
-			_contrast: -0.45,
-			_contrastExtremity: -0.55,
-			width: 1.06,
-			spacing: 0.08,
-			opticThickness: 0.95,
-			aperture: 1.22,
-			apertureTop: 1.14,
-			apertureBottom: 1.28,
-			curviness: 0.68,
+			_contrast: -0.72,
+			_contrastExtremity: -0.8,
+			width: 0.9,
+			spacing: 0.1,
+			opticThickness: 0.94,
+			aperture: 1.2,
+			apertureTop: 1.12,
+			apertureBottom: 1.26,
+			curviness: 0.62,
+			serifWidth: 36,
+			serifHeight: 8,
 		},
 	},
 ];
@@ -139,7 +189,12 @@ for (const cut of cuts) {
 		},
 		dbPath,
 	);
-	exported.push({...file, file: cut.file, styleName: cut.styleName});
+	exported.push({
+		...file,
+		file: cut.file,
+		styleName: cut.styleName,
+		base: cut.templateName,
+	});
 }
 
 const zip = new JSZip();

@@ -55,7 +55,9 @@ await page.evaluate(async () => {
 
 const cuts = [
 	{id: 'ultra-bold', shot: 'skoljka-logo-54-ultra-bold.png', logo: '54-ultra-bold.png'},
+	{id: 'humanist', shot: 'skoljka-logo-54-humanist.png', logo: '54-humanist.png'},
 	{id: 'ultra-contrast', shot: 'skoljka-logo-54-ultra-contrast.png', logo: '54-ultra-contrast.png'},
+	{id: 'fell-contrast', shot: 'skoljka-logo-54-fell-contrast.png', logo: '54-fell-contrast.png'},
 	{id: 'elegant', shot: 'skoljka-logo-54-elegant.png', logo: '54-elegant.png'},
 ];
 

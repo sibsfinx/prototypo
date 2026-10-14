@@ -55,7 +55,7 @@ Read `node_modules/<pkg>/dist/font.json` (same sources `scripts/copy-templates` 
 
 Specimen: `pnpm mcp:demo` writes Obala/Kej (Školjka) and Finx Regular/Book (alexmesch.com) plus zips. Open `mcp/demo/index.html` and `mcp/demo/alexmesch.html`.
 
-Logo optical sizes (not text): `pnpm mcp:demo:logos` writes Skoljka Logo UltraBold / UltraContrast / Elegant and `skoljka-logo-typefaces.zip`. Open `mcp/demo/logo.html` — mark is **54** only.
+Logo optical sizes (not text): `pnpm mcp:demo:logos` writes Skoljka Logo cuts across Grotesk, Antique (humanist), Spectral, Fell, Elzevir — tall/solid logo DNA — plus `skoljka-logo-typefaces.zip`. Open `mcp/demo/logo.html` — mark is **54** only.
 
 ## Security
 
