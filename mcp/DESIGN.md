@@ -55,7 +55,7 @@ Read `node_modules/<pkg>/dist/font.json` (same sources `scripts/copy-templates` 
 
 Specimen: `pnpm mcp:demo` writes Obala/Kej (Školjka) and Finx Regular/Book (alexmesch.com) plus zips. Open `mcp/demo/index.html` and `mcp/demo/alexmesch.html`.
 
-`pnpm mcp:demo:54` cuts three logo faces for the "54" seafood restaurant mark: Sidro Black (ultra bold, Grotesk), Plima Contrast (ultra contrast, Grotesk with hairline thins) and Biser Light (elegant, Elzevir). It writes outlined SVG logos to `mcp/demo/logos/` (PNGs there are rasterized from those SVGs). Specimen: `mcp/demo/54.html`.
+`pnpm mcp:demo:54` cuts three logo faces for the "54" seafood restaurant mark: Sidro Black (ultra bold, Grotesk), Plima Contrast (ultra contrast, Grotesk with hairline thins) and Biser Light (elegant, Elzevir). A second set is taller (xHeight 650 + capDelta 380) but still solid: Jarbol Black (Grotesk), Val Black / Val Contrast (humanist grotesk: Grotesk with wide apertures, rounder curves and mild contrast), Udica Black (humanist sans: Spectral with serifs zeroed), Mreza Bold (humanist sans from Fell, old-style figures) and Luka Black (tall Spectral serif). Antique Gothic was tried and dropped: it breaks apart at these weights. It writes outlined SVG logos to `mcp/demo/logos/` (PNGs there are rasterized from those SVGs). Specimen: `mcp/demo/54.html`.
 
 ## Security
 

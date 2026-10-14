@@ -23,12 +23,49 @@
 			font-weight: 300;
 			font-display: block;
 		}
+		@font-face {
+			font-family: "Jarbol";
+			src: url("./fonts/Jarbol-Black.otf") format("opentype");
+			font-weight: 900;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Val";
+			src: url("./fonts/Val-Black.otf") format("opentype");
+			font-weight: 900;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Val";
+			src: url("./fonts/Val-Contrast.otf") format("opentype");
+			font-weight: 950;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Udica";
+			src: url("./fonts/Udica-Black.otf") format("opentype");
+			font-weight: 900;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Mreza";
+			src: url("./fonts/Mreza-Bold.otf") format("opentype");
+			font-weight: 700;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Luka";
+			src: url("./fonts/Luka-Black.otf") format("opentype");
+			font-weight: 900;
+			font-display: block;
+		}
 
 		:root {
 			--navy: #0b2a3c;
 			--foam: #e6efec;
 			--sand: #f3ebdd;
 			--coral: #d9472b;
+			--teal: #1d5c63;
 		}
 
 		* {
@@ -44,7 +81,6 @@
 		main {
 			display: grid;
 			grid-template-columns: repeat(3, 1fr);
-			min-height: 100vh;
 		}
 
 		.mark {
@@ -77,12 +113,59 @@
 			background: var(--navy);
 		}
 
+		.tall .mark {
+			font-size: clamp(120px, 15vw, 300px);
+		}
+
+		.tall-grotesk {
+			font-family: "Jarbol", sans-serif;
+			font-weight: 900;
+			color: var(--navy);
+			background: var(--sand);
+		}
+
+		.tall-humanist-grotesk {
+			font-family: "Val", sans-serif;
+			font-weight: 900;
+			color: var(--sand);
+			background: var(--teal);
+		}
+
+		.tall-humanist-grotesk-contrast {
+			font-family: "Val", sans-serif;
+			font-weight: 950;
+			color: var(--coral);
+			background: var(--foam);
+		}
+
+		.tall-humanist-spectral {
+			font-family: "Udica", sans-serif;
+			font-weight: 900;
+			color: var(--foam);
+			background: var(--navy);
+		}
+
+		.tall-humanist-fell {
+			font-family: "Mreza", sans-serif;
+			font-weight: 700;
+			color: var(--teal);
+			background: var(--sand);
+		}
+
+		.tall-serif {
+			font-family: "Luka", serif;
+			font-weight: 900;
+			color: var(--navy);
+			background: var(--foam);
+		}
+
 		@media (max-width: 760px) {
 			main {
 				grid-template-columns: 1fr;
 			}
 
-			.mark {
+			.mark,
+			.tall .mark {
 				font-size: 46vw;
 			}
 		}
@@ -93,6 +176,14 @@
 		<div class="mark bold" aria-label="54, ultra bold">54</div>
 		<div class="mark contrast" aria-label="54, ultra contrast">54</div>
 		<div class="mark elegant" aria-label="54, elegant">54</div>
+	</main>
+	<main class="tall">
+		<div class="mark tall-grotesk" aria-label="54, tall grotesk">54</div>
+		<div class="mark tall-humanist-grotesk" aria-label="54, tall humanist grotesk">54</div>
+		<div class="mark tall-humanist-grotesk-contrast" aria-label="54, tall humanist grotesk, contrast">54</div>
+		<div class="mark tall-humanist-spectral" aria-label="54, tall humanist sans from Spectral">54</div>
+		<div class="mark tall-humanist-fell" aria-label="54, tall humanist sans from Fell">54</div>
+		<div class="mark tall-serif" aria-label="54, tall serif">54</div>
 	</main>
 </body>
 </html>

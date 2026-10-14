@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Three logo cuts for the "54" seafood restaurant mark, plus outlined SVG logos.
+// Logo cuts for the "54" seafood restaurant mark, plus outlined SVG logos.
 import '../register-app.mjs';
 import {mkdirSync, readFileSync, writeFileSync} from 'fs';
 import {join, dirname} from 'path';
@@ -24,6 +24,7 @@ const PALETTE = {
 	foam: '#e6efec',
 	sand: '#f3ebdd',
 	coral: '#d9472b',
+	teal: '#1d5c63',
 };
 
 const cuts = [
@@ -83,6 +84,134 @@ const cuts = [
 	},
 ];
 
+// Taller, still-solid figures (xHeight + capDelta ~1030 vs ~750 default),
+// including humanist sans built by stripping serifs off calligraphic skeletons.
+const TALL = {xHeight: 650, capDelta: 380};
+const HUMANIST_GROTESK = {
+	aperture: 1.6,
+	apertureTop: 1.3,
+	apertureBottom: 1.5,
+	curviness: 0.8,
+};
+const NO_SERIFS = {serifWidth: 0.05, serifHeight: 0.001, spurHeight: 0};
+
+const tallCuts = [
+	{
+		key: 'tall-grotesk',
+		file: 'Jarbol-Black.otf',
+		familyName: 'Jarbol',
+		styleName: 'Black',
+		templateName: 'venus.ptf',
+		weight: 900,
+		width: 'medium',
+		colors: {ink: PALETTE.navy, paper: PALETTE.sand},
+		values: {
+			...TALL,
+			thickness: 150,
+			width: 1.12,
+			opticThickness: 1.1,
+			aperture: 1.3,
+			apertureBottom: 1.35,
+			curviness: 0.55,
+			crossbar: 0.92,
+			spacing: -0.05,
+		},
+	},
+	{
+		key: 'tall-humanist-grotesk',
+		file: 'Val-Black.otf',
+		familyName: 'Val',
+		styleName: 'Black',
+		templateName: 'venus.ptf',
+		weight: 900,
+		width: 'medium',
+		colors: {ink: PALETTE.sand, paper: PALETTE.teal},
+		values: {
+			...TALL,
+			...HUMANIST_GROTESK,
+			thickness: 155,
+			width: 1.1,
+			_contrast: -0.7,
+			_contrastExtremity: -0.75,
+			spacing: -0.03,
+		},
+	},
+	{
+		key: 'tall-humanist-grotesk-contrast',
+		file: 'Val-Contrast.otf',
+		familyName: 'Val',
+		styleName: 'Contrast',
+		templateName: 'venus.ptf',
+		weight: 950,
+		width: 'medium',
+		colors: {ink: PALETTE.coral, paper: PALETTE.foam},
+		values: {
+			...TALL,
+			...HUMANIST_GROTESK,
+			thickness: 170,
+			width: 1.1,
+			_contrast: -0.4,
+			_contrastExtremity: -0.45,
+		},
+	},
+	{
+		key: 'tall-humanist-spectral',
+		file: 'Udica-Black.otf',
+		familyName: 'Udica',
+		styleName: 'Black',
+		templateName: 'gfnt.ptf',
+		weight: 900,
+		width: 'medium',
+		colors: {ink: PALETTE.foam, paper: PALETTE.navy},
+		values: {
+			...TALL,
+			...NO_SERIFS,
+			thickness: 160,
+			width: 1.1,
+			_contrast: -0.7,
+			aperture: 1.2,
+		},
+	},
+	{
+		key: 'tall-humanist-fell',
+		file: 'Mreza-Bold.otf',
+		familyName: 'Mreza',
+		styleName: 'Bold',
+		templateName: 'john-fell.ptf',
+		weight: 700,
+		width: 'medium',
+		colors: {ink: PALETTE.teal, paper: PALETTE.sand},
+		values: {
+			xHeight: 620,
+			capDelta: 350,
+			thickness: 150,
+			width: 1.1,
+			_contrast: -0.7,
+			serifWidth: 0.001,
+			serifHeight: 0,
+			serifCurve: 0,
+		},
+	},
+	{
+		key: 'tall-serif',
+		file: 'Luka-Black.otf',
+		familyName: 'Luka',
+		styleName: 'Black',
+		templateName: 'gfnt.ptf',
+		weight: 900,
+		width: 'medium',
+		colors: {ink: PALETTE.navy, paper: PALETTE.foam},
+		values: {
+			...TALL,
+			thickness: 165,
+			width: 1.08,
+			_contrast: -0.5,
+			serifWidth: 45,
+			serifHeight: 20,
+		},
+	},
+];
+
 function controlInits(templateName) {
 	return Object.fromEntries(
 		getControls(templateName).parameters.map((p) => [p.name, p.init]),
@@ -104,7 +233,7 @@ function logoSvg(font, {ink, paper}, {size = 1000, pad = 0.2} = {}) {
 
 const zip = new JSZip();
 const out = [];
-for (const cut of cuts) {
+for (const cut of [...cuts, ...tallCuts]) {
 	const {buffer, glyphCount} = buildOtf({
 		templateName: cut.templateName,
 		values: {...controlInits(cut.templateName), ...cut.values},
