@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>54 logo cuts</title>
+	<style>
+		@font-face {
+			font-family: "Sidro";
+			src: url("./fonts/Sidro-Black.otf") format("opentype");
+			font-weight: 900;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Plima";
+			src: url("./fonts/Plima-Contrast.otf") format("opentype");
+			font-weight: 800;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Biser";
+			src: url("./fonts/Biser-Light.otf") format("opentype");
+			font-weight: 300;
+			font-display: block;
+		}
+
+		:root {
+			--navy: #0b2a3c;
+			--foam: #e6efec;
+			--sand: #f3ebdd;
+			--coral: #d9472b;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			margin: 0;
+			background: var(--navy);
+		}
+
+		main {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			min-height: 100vh;
+		}
+
+		.mark {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			aspect-ratio: 1;
+			line-height: 1;
+			font-size: clamp(120px, 17vw, 320px);
+		}
+
+		.bold {
+			font-family: "Sidro", sans-serif;
+			font-weight: 900;
+			color: var(--coral);
+			background: var(--sand);
+		}
+
+		.contrast {
+			font-family: "Plima", serif;
+			font-weight: 800;
+			color: var(--navy);
+			background: var(--foam);
+		}
+
+		.elegant {
+			font-family: "Biser", serif;
+			font-weight: 300;
+			color: var(--sand);
+			background: var(--navy);
+		}
+
+		@media (max-width: 760px) {
+			main {
+				grid-template-columns: 1fr;
+			}
+
+			.mark {
+				font-size: 46vw;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<div class="mark bold" aria-label="54, ultra bold">54</div>
+		<div class="mark contrast" aria-label="54, ultra contrast">54</div>
+		<div class="mark elegant" aria-label="54, elegant">54</div>
+	</main>
+</body>
+</html>

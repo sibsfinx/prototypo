@@ -117,6 +117,7 @@
     "start": "node scripts/copy-templates.mjs && vite",
     "mcp": "node mcp/server.mjs",
     "mcp:demo": "node mcp/demo/create-fonts.mjs",
+    "mcp:demo:54": "node mcp/demo/create-54.mjs",
     "storybook": "start-storybook -p 6006",
     "test": "NODE_PATH=$pwd/node_modules:$(pwd)/app jest",
     "test:unit": "node --import ./mcp/register-app.mjs --test __tests__/unit/*.test.mjs",

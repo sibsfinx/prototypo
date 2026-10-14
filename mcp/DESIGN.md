@@ -55,6 +55,8 @@ Read `node_modules/<pkg>/dist/font.json` (same sources `scripts/copy-templates` 
 
 Specimen: `pnpm mcp:demo` writes Obala/Kej (Školjka) and Finx Regular/Book (alexmesch.com) plus zips. Open `mcp/demo/index.html` and `mcp/demo/alexmesch.html`.
 
+`pnpm mcp:demo:54` cuts three logo faces for the "54" seafood restaurant mark: Sidro Black (ultra bold, Grotesk), Plima Contrast (ultra contrast, Grotesk with hairline thins) and Biser Light (elegant, Elzevir). It writes outlined SVG logos to `mcp/demo/logos/` (PNGs there are rasterized from those SVGs). Specimen: `mcp/demo/54.html`.
+
 ## Security
 
 Local process, local files only. Does not fetch fonts or upload values. `templateName` is allow-listed to the five packages (no path traversal into `node_modules`/elsewhere). `set_param` rejects names that are not in that template's controls.
