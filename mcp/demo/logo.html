@@ -20,34 +20,31 @@
 		@font-face {
 			font-family: "Skoljka Logo UltraContrast";
 			src: url("./fonts/SkoljkaLogo-UltraContrast.otf") format("opentype");
-			font-weight: 700;
+			font-weight: 800;
 			font-display: block;
 		}
 		@font-face {
 			font-family: "Skoljka Logo FellContrast";
 			src: url("./fonts/SkoljkaLogo-FellContrast.otf") format("opentype");
-			font-weight: 700;
+			font-weight: 800;
 			font-display: block;
 		}
 		@font-face {
 			font-family: "Skoljka Logo Elegant";
 			src: url("./fonts/SkoljkaLogo-Elegant.otf") format("opentype");
-			font-weight: 300;
+			font-weight: 400;
 			font-display: block;
 		}
 
 		:root {
-			--ink: #0c0c0c;
-			--paper: #f7f4ef;
-			--sea: #0e3a3a;
-			--foam: #e8f0ee;
-			--gold: #c4a574;
-			--clay: #2a1f18;
-			--sand: #ebe4d6;
+			--navy: #0a1628;
+			--navy-deep: #060e1a;
+			--gold: #c9a227;
+			--gold-soft: #d4b45a;
 		}
 
 		* { box-sizing: border-box; margin: 0; }
-		html, body { background: var(--paper); color: var(--ink); }
+		html, body { background: var(--navy-deep); color: var(--gold); }
 
 		.plate {
 			min-height: 100vh;
@@ -56,79 +53,49 @@
 			place-items: center;
 			position: relative;
 			overflow: hidden;
+			background: var(--navy);
 		}
 		.plate::before {
 			content: "";
 			position: absolute;
 			inset: 0;
+			background: radial-gradient(ellipse 70% 55% at 50% 48%, rgba(201,162,39,0.07), transparent 65%);
 			pointer-events: none;
 		}
 
 		.mark {
 			position: relative;
-			font-size: clamp(140px, 42vw, 420px);
-			line-height: 0.82;
-			letter-spacing: -0.02em;
+			font-size: clamp(150px, 44vw, 440px);
+			line-height: 0.78;
+			letter-spacing: -0.1em;
+			color: var(--gold);
 			user-select: none;
 		}
 
-		#ultra-bold { background: var(--ink); }
-		#ultra-bold::before {
-			background: radial-gradient(ellipse 70% 50% at 50% 45%, rgba(232,240,238,0.08), transparent 65%);
-		}
 		#ultra-bold .mark {
 			font-family: "Skoljka Logo UltraBold", sans-serif;
 			font-weight: 900;
-			color: var(--foam);
-		}
-
-		#humanist { background: var(--clay); }
-		#humanist::before {
-			background:
-				linear-gradient(180deg, rgba(235,228,214,0.06), transparent 45%),
-				radial-gradient(ellipse 80% 55% at 50% 40%, rgba(196,165,116,0.1), transparent 70%);
+			letter-spacing: -0.12em;
 		}
 		#humanist .mark {
 			font-family: "Skoljka Logo Humanist", sans-serif;
 			font-weight: 800;
-			color: var(--sand);
-			letter-spacing: -0.01em;
-		}
-
-		#ultra-contrast { background: var(--sea); }
-		#ultra-contrast::before {
-			background:
-				linear-gradient(135deg, rgba(196,165,116,0.18), transparent 50%),
-				radial-gradient(ellipse 90% 70% at 50% 50%, rgba(255,255,255,0.04), transparent 60%);
+			letter-spacing: -0.1em;
 		}
 		#ultra-contrast .mark {
 			font-family: "Skoljka Logo UltraContrast", serif;
-			font-weight: 700;
-			color: var(--gold);
-			letter-spacing: 0;
-		}
-
-		#fell-contrast { background: #1a1410; }
-		#fell-contrast::before {
-			background: radial-gradient(ellipse 75% 55% at 50% 48%, rgba(196,165,116,0.12), transparent 65%);
+			font-weight: 800;
+			color: var(--gold-soft);
 		}
 		#fell-contrast .mark {
 			font-family: "Skoljka Logo FellContrast", serif;
-			font-weight: 700;
-			color: #e6d5b8;
-			letter-spacing: 0;
-		}
-
-		#elegant { background: var(--paper); }
-		#elegant::before {
-			background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(14,58,58,0.05), transparent 70%);
+			font-weight: 800;
 		}
 		#elegant .mark {
 			font-family: "Skoljka Logo Elegant", serif;
-			font-weight: 300;
-			color: var(--sea);
-			letter-spacing: 0.02em;
-			font-size: clamp(120px, 38vw, 380px);
+			font-weight: 400;
+			letter-spacing: -0.06em;
+			font-size: clamp(140px, 40vw, 400px);
 		}
 
 		.rail {
@@ -145,11 +112,11 @@
 			font: 10px/1.2 ui-monospace, monospace;
 			letter-spacing: 0.14em;
 			text-transform: uppercase;
-			background: rgba(247,244,239,0.92);
-			border-bottom: 1px solid rgba(0,0,0,0.06);
+			background: rgba(6,14,26,0.92);
+			border-bottom: 1px solid rgba(201,162,39,0.18);
 		}
-		.rail a { color: #666; text-decoration: none; }
-		.rail a:hover { color: #000; }
+		.rail a { color: #8a7a4a; text-decoration: none; }
+		.rail a:hover { color: var(--gold); }
 		body.capture .rail { display: none; }
 	</style>
 </head>
