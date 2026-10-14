@@ -25,3 +25,6 @@ blob-report
 playwright/.cache
 .prototypo-local-db.json
 mcp/demo/prototypo-demo-db.json
+mcp/demo/prototypo-logo-db.json
+# large capture copies live under /opt/cursor/artifacts; keep small logo crops in repo if needed
+mcp/demo/images/logos/skoljka-logo-54-*.png

@@ -55,6 +55,8 @@ Read `node_modules/<pkg>/dist/font.json` (same sources `scripts/copy-templates` 
 
 Specimen: `pnpm mcp:demo` writes Obala/Kej (Školjka) and Finx Regular/Book (alexmesch.com) plus zips. Open `mcp/demo/index.html` and `mcp/demo/alexmesch.html`.
 
+Logo optical sizes (not text): `pnpm mcp:demo:logos` writes Skoljka Logo UltraBold / UltraContrast / Elegant and `skoljka-logo-typefaces.zip`. Open `mcp/demo/logo.html` — mark is **54** only.
+
 ## Security
 
 Local process, local files only. Does not fetch fonts or upload values. `templateName` is allow-listed to the five packages (no path traversal into `node_modules`/elsewhere). `set_param` rejects names that are not in that template's controls.

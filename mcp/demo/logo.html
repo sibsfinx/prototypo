@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Školjka Logo — 54</title>
+	<style>
+		@font-face {
+			font-family: "Skoljka Logo UltraBold";
+			src: url("./fonts/SkoljkaLogo-UltraBold.otf") format("opentype");
+			font-weight: 900;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Skoljka Logo UltraContrast";
+			src: url("./fonts/SkoljkaLogo-UltraContrast.otf") format("opentype");
+			font-weight: 700;
+			font-display: block;
+		}
+		@font-face {
+			font-family: "Skoljka Logo Elegant";
+			src: url("./fonts/SkoljkaLogo-Elegant.otf") format("opentype");
+			font-weight: 300;
+			font-display: block;
+		}
+
+		:root {
+			--ink: #0c0c0c;
+			--paper: #f7f4ef;
+			--sea: #0e3a3a;
+			--foam: #e8f0ee;
+			--gold: #c4a574;
+		}
+
+		* { box-sizing: border-box; margin: 0; }
+		html, body { background: var(--paper); color: var(--ink); }
+
+		/* Anagrama: one composition per plate, grid, no chrome on the mark */
+		.plate {
+			min-height: 100vh;
+			min-height: 100dvh;
+			display: grid;
+			place-items: center;
+			position: relative;
+			overflow: hidden;
+		}
+		.plate::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background:
+				linear-gradient(180deg, rgba(14,58,58,0.04), transparent 42%),
+				radial-gradient(ellipse 80% 60% at 50% 40%, rgba(196,165,116,0.12), transparent 70%);
+			pointer-events: none;
+		}
+
+		.mark {
+			position: relative;
+			font-size: clamp(140px, 42vw, 420px);
+			line-height: 0.85;
+			letter-spacing: -0.04em;
+			color: var(--ink);
+			user-select: none;
+		}
+
+		#ultra-bold {
+			background: var(--ink);
+		}
+		#ultra-bold::before {
+			background:
+				radial-gradient(ellipse 70% 50% at 50% 45%, rgba(232,240,238,0.08), transparent 65%);
+		}
+		#ultra-bold .mark {
+			font-family: "Skoljka Logo UltraBold", sans-serif;
+			font-weight: 900;
+			color: var(--foam);
+			letter-spacing: -0.02em;
+		}
+
+		#ultra-contrast {
+			background: var(--sea);
+		}
+		#ultra-contrast::before {
+			background:
+				linear-gradient(135deg, rgba(196,165,116,0.18), transparent 50%),
+				radial-gradient(ellipse 90% 70% at 50% 50%, rgba(255,255,255,0.04), transparent 60%);
+		}
+		#ultra-contrast .mark {
+			font-family: "Skoljka Logo UltraContrast", serif;
+			font-weight: 700;
+			color: var(--gold);
+			letter-spacing: 0;
+		}
+
+		#elegant {
+			background: var(--paper);
+		}
+		#elegant .mark {
+			font-family: "Skoljka Logo Elegant", sans-serif;
+			font-weight: 300;
+			color: var(--sea);
+			letter-spacing: 0.02em;
+			font-size: clamp(120px, 38vw, 380px);
+		}
+
+		/* Off-plate index only — not part of the logo */
+		.rail {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 5;
+			display: flex;
+			gap: 18px;
+			justify-content: center;
+			padding: 14px;
+			font: 11px/1.2 ui-monospace, monospace;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+			background: rgba(247,244,239,0.92);
+			border-bottom: 1px solid rgba(0,0,0,0.06);
+		}
+		.rail a { color: #666; text-decoration: none; }
+		.rail a:hover { color: #000; }
+		body.capture .rail { display: none; }
+	</style>
+</head>
+<body>
+	<nav class="rail" aria-label="Cuts">
+		<a href="#ultra-bold">Ultra Bold</a>
+		<a href="#ultra-contrast">Ultra Contrast</a>
+		<a href="#elegant">Elegant</a>
+	</nav>
+
+	<section class="plate" id="ultra-bold" data-cut="ultra-bold">
+		<div class="mark" aria-label="Logo 54">54</div>
+	</section>
+	<section class="plate" id="ultra-contrast" data-cut="ultra-contrast">
+		<div class="mark" aria-label="Logo 54">54</div>
+	</section>
+	<section class="plate" id="elegant" data-cut="elegant">
+		<div class="mark" aria-label="Logo 54">54</div>
+	</section>
+</body>
+</html>
