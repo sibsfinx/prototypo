@@ -84,6 +84,41 @@ const overview = join(artifactShots, 'skoljka-logo-54-overview.png');
 await page.screenshot({path: overview, fullPage: true, type: 'png'});
 copyFileSync(overview, join(demoLogos, 'skoljka-logo-54-overview.png'));
 
+const elegantCuts = [
+	{id: 'e01', shot: 'elegant-10-01-ultra-bold.png', logo: 'e01-ultra-bold.png'},
+	{id: 'e02', shot: 'elegant-10-02-black.png', logo: 'e02-black.png'},
+	{id: 'e03', shot: 'elegant-10-03-tall.png', logo: 'e03-tall.png'},
+	{id: 'e04', shot: 'elegant-10-04-contrast.png', logo: 'e04-contrast.png'},
+	{id: 'e05', shot: 'elegant-10-05-ultra-bold-black.png', logo: 'e05-ultra-bold-black.png'},
+	{id: 'e06', shot: 'elegant-10-06-ultra-bold-tall.png', logo: 'e06-ultra-bold-tall.png'},
+	{id: 'e07', shot: 'elegant-10-07-ultra-bold-contrast.png', logo: 'e07-ultra-bold-contrast.png'},
+	{id: 'e08', shot: 'elegant-10-08-black-tall.png', logo: 'e08-black-tall.png'},
+	{id: 'e09', shot: 'elegant-10-09-tall-contrast.png', logo: 'e09-tall-contrast.png'},
+	{id: 'e10', shot: 'elegant-10-10-all.png', logo: 'e10-all.png'},
+];
+
+await page.goto(`${base}/logo-elegant-10.html`, {waitUntil: 'networkidle'});
+await page.evaluate(async () => {
+	await document.fonts.ready;
+	await new Promise((r) => setTimeout(r, 400));
+});
+
+const elegant = [];
+for (const cut of elegantCuts) {
+	const el = page.locator(`#${cut.id}`);
+	await el.scrollIntoViewIfNeeded();
+	await page.waitForTimeout(120);
+	const shotPath = join(artifactShots, cut.shot);
+	await el.screenshot({path: shotPath, type: 'png'});
+	const logoPath = join(artifactLogos, cut.logo);
+	await el.locator('.mark').screenshot({path: logoPath, type: 'png'});
+	copyFileSync(logoPath, join(demoLogos, cut.logo));
+	elegant.push({cut: cut.id, screenshot: shotPath, logo: logoPath});
+}
+
+const elegantSheet = join(artifactShots, 'elegant-10-sheet.png');
+await page.screenshot({path: elegantSheet, fullPage: true, type: 'png'});
+
 await browser.close();
 server.close();
-console.log(JSON.stringify({results, overview}, null, 2));
+console.log(JSON.stringify({results, overview, elegant, elegantSheet}, null, 2));
